@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="group__example__list" kind="group">
+    <compoundname>example_list</compoundname>
+    <title>Example_list</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><heading level="1">Project Zero (project0)</heading>
+</para><para>This example demonstrates the use of TivaWare to setup the clocks and toggle GPIO pins to make the LED&apos;s blink. This is a good place to start understanding your launchpad and the tools that can be used to program it. See <ulink url="http://www.ti.com/tm4c123g-launchpad/project0">http://www.ti.com/tm4c123g-launchpad/project0</ulink> for more information and tutorial videos. </para>    </detaileddescription>
+  </compounddef>
+</doxygen>
