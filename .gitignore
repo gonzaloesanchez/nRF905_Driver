@@ -1,0 +1,10 @@
+.ccsproject
+.cproject
+.launches/
+.project
+.settings/
+Debug/
+macros.ini_initial
+project0_ccs.cmd
+targetConfigs/
+target_config.ccxml
