@@ -11,7 +11,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-extern nRF905 g_nRF905_Config;
+/**
+ * Definiciones generales (Frecuencia de SPI y ancho en bits de los paquetes
+ */
+#define SPI_FREC		1e6		//1[MHz]
+#define	SPI_DATAWIDTH	8
+
+#define ON				0xFF
+#define OFF				0x00
+
 
 /**
  * Definiciones Dependiendo de la plataforma de HW utilizada.
@@ -20,14 +28,44 @@ extern nRF905 g_nRF905_Config;
  */
 
 #ifdef TIVA_C
-#define TX_EN_BASE
-#define TX_EN_GPIO
 
-#define TRX_CE_BASE
-#define TRX_CE_GPIO
+/**
+ * Includes especificos para TivaC
+ */
+#include "inc/hw_memmap.h"
+#include "driverlib/gpio.h"
+#include "driverlib/ssi.h"
 
-#define PWR_UP_BASE
-#define PWR_UP_GPIO
+
+/**
+ * Definiciones de hardware para pines
+ */
+#define TX_EN_BASE				GPIO_PORTB_BASE
+#define TX_EN_GPIO				GPIO_PIN_5
+
+#define TRX_CE_BASE				GPIO_PORTB_BASE
+#define TRX_CE_GPIO				GPIO_PIN_0
+
+#define PWR_UP_BASE				GPIO_PORTB_BASE
+#define PWR_UP_GPIO				GPIO_PIN_1
+
+#define ADDRESS_MATCH_BASE		GPIO_PORTB_BASE
+#define ADDRESS_MATCH_GPIO		GPIO_PIN_2
+
+#define DATA_READY_BASE			GPIO_PORTB_BASE
+#define DATA_READY_GPIO			GPIO_PIN_6
+
+#define CARRIER_DETECT_BASE		GPIO_PORTB_BASE
+#define CARRIER_DETECT_GPIO		GPIO_PIN_7
+
+#define CHIP_ENABLE_BASE		GPIO_PORTA_BASE
+#define CHIP_ENABLE_GPIO		GPIO_PIN_3
+/**
+ * Definiciones de hardware para SPI
+ */
+
+#define SPI_BASE				SSI0_BASE
+
 #endif
 
 #ifdef MSP430
@@ -65,6 +103,15 @@ struct _nRF905 {
 						//estos FLAGS
 };
 
+struct _spi_flags  {
+	bool irqTX;
+	bool irqRX;
+};
+
 typedef struct _nRF905 nRF905;
+typedef struct _spi_flags spi_flags;
+
+extern nRF905 g_nRF905_Config;
+extern spi_flags g_spi_Control;
 
 #endif /* NRF905_H_ */
