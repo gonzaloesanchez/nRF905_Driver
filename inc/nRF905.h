@@ -1,8 +1,9 @@
-/*
- * nRF905_Defs.h
- *
- *  Created on: 19/08/2017
- *      Author: Gonza
+/**
+ * @file nRF905.h
+ * @brief Archivo con definiciones necesarias para el driver de nRF905
+ * @date 19/08/2017
+ * @author Gonza
+ * @see http://www.nordicsemi.com/eng/nordic/download_resource/8075/1/73282575/2452
  */
 
 #ifndef NRF905_H_
@@ -12,13 +13,18 @@
 #include <stdbool.h>
 
 /**
- * Definiciones generales (Frecuencia de SPI y ancho en bits de los paquetes
+ * @brief Definiciones generales para el proyecto.
+ * Aqui se define la frecuencia de SPI y ancho en bits de los paquetes que son enviados por
+ * el bus SPI. Ademas de definirse algunas constantes de uso como ser @c ON y @c OFF
  */
-#define SPI_FREC		1e6		//1[MHz]
-#define	SPI_DATAWIDTH	8
+
+#define SPI_FREC		1e6		/**<Constante numerica para 1[MHz]*/
+#define	SPI_DATAWIDTH	8		/**<Longitud en bits de la transferencia*/
 
 #define ON				0xFF
 #define OFF				0x00
+
+#define C_WRITE_TX_ADD	0x22	//Comando SPI para escribir la direccion donde transmitir
 
 
 /**
@@ -35,6 +41,7 @@
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/ssi.h"
+#include "driverlib/sysctl.h"
 
 
 /**
@@ -112,6 +119,11 @@ typedef struct _nRF905 nRF905;
 typedef struct _spi_flags spi_flags;
 
 extern nRF905 g_nRF905_Config;
-extern spi_flags g_spi_Control;
+
+void nRF905_setTXFlag(void);
+bool nRF905_setTXAddress(uint32_t Direccion);
+
+void escribir(void);
+void leer(void);
 
 #endif /* NRF905_H_ */

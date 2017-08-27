@@ -6,6 +6,7 @@
  */
 
 /**
+ * @brief Modulo que implementa el driver para nRF905.
  * Este modulo define las funciones necesarias para implementar comunicaciones
  * con el modulo RF basado en el chip nRF905 de NORDIC. Se deben tener ciertos
  * cuidados para cada plataforma: Esta libreria utiliza interrupciones, asi que
@@ -30,7 +31,7 @@
 #include "nRF905.h"
 
 /**
- * Definiciones globales de este modulo, no visibles hacia afuera
+ * @brief Definiciones globales de este modulo, no visibles hacia afuera
  */
 
 static uint8_t g_ui8StatusReg;	//esta variable contiene status despues de cada
@@ -47,7 +48,7 @@ static spi_flags g_spi_Control;		//esta es una variable global que debe ser modi
 									//de esta libreria. La modificacion solo se hara
 									//mediante funciones set desde las interrupciones
 
-/**--------------------------------------------------------------------------
+/*--------------------------------------------------------------------------
  * Funciones de bajo nivel. Estas son las que deben ser re-definidas para
  * cada plataforma de HW en las que se porte el codigo
  *
@@ -58,32 +59,44 @@ static spi_flags g_spi_Control;		//esta es una variable global que debe ser modi
  * la transmision exitosas de un paquete, para no quedar en un while esperando
  * que se concreten. Esto esta mas que nada pensado para los nodos que estan
  * alimentados a bateria.
- * --------------------------------------------------------------------------
- */
-
-/**
- * Esta funcion es la que se encarga de enviar los comandos por el HW SPI, y
- * debe ser implementada para cada HW distinto.
- * Toma como argumento el valor a enviar.
- * Devuelve true si el envio fue exitoso, o false en caso contrario.
- * Esta funcion se implementa con funciones NO BLOQUEANTES.
- * Las causas de falla normalmente son que no haya lugar en el FIFO.
  *
- * 		USAR INTERRUPCIONES
+ * @code
+ * 		//USAR INTERRUPCIONES
  * 		while(variable_global)  {
  * 			WFI;
  * 		}
- * 		Variable global podra ser cambiada por software para dar portabilidad (esto es
- * 		solo para cuando se documente, para el final)
+ * @endcode
+ * @p variable_global podra ser cambiada por software para dar portabilidad
+ * --------------------------------------------------------------------------
  */
-static bool spi_write(uint8_t Comando,uint16_t Dato)  {
+
+
+/**
+ * @brief Esta funcion es la que se encarga de enviar los comandos por el HW SPI.
+ *
+ * La funcion debe ser implementada para cada HW distinto.
+ * @param Comando Es el comando a enviar. Los comandos son: (Agregar tabla de comandos)
+ * @param Dato Es el parametro a enviar para configurar el modulo nRF905
+ * @return La funcion devuelve @p TRUE si el envio fue exitoso o @p FALSE en caso contrario
+ * @note Esta funcion se implementa con funciones NO BLOQUEANTES.
+ * @warning Las causas de falla normalmente son que no haya lugar en el FIFO.
+ */
+static bool spi_write(uint8_t Comando)  {
 	bool Ret = false;
 	uint32_t Aux;
 
 #ifdef TIVA_C
 
-	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,OFF);	//CS -> Low (Habilitacion Negada)
-	if(!SSIDataPutNonBlocking(SPI_BASE,(uint32_t)S))		//Ponemos el Comando en el buffer FIFO
+	if(SSIDataPutNonBlocking(SPI_BASE,(uint32_t)Comando))	//Ponemos el Comando en el buffer FIFO
+		Ret = true;				//la transaccion fue exitosa
+
+#endif
+
+
+#ifdef MSP430
+	/*
+	 * 	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,OFF);	//CS -> Low (Habilitacion Negada)
+	if(!SSIDataPutNonBlocking(SPI_BASE,(uint32_t)Comando))	//Ponemos el Comando en el buffer FIFO
 		return Ret;										//Si esta funcion devuelve != 0 el
 														//envio se iniciara en breves instantes
 														//caso contrario debemos salir, es una excepcion
@@ -116,13 +129,7 @@ static bool spi_write(uint8_t Comando,uint16_t Dato)  {
 	while(SSIDataGetNonBlocking(SPI_BASE,&Aux));	//sacamos toda la basura del FIFO
 
 	Ret = true;				//si llegamos hasta aqui, la transaccion fue exitosa
-	return Ret;
-
-
-#endif
-
-
-#ifdef MSP430
+	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,ON);	//CS -> High (Habilitacion Negada)*/
 #endif
 
 
@@ -150,17 +157,16 @@ static bool spi_write(uint8_t Comando,uint16_t Dato)  {
  * 		Variable global podra ser cambiada por software para dar portabilidad (esto es
  * 		solo para cuando se documente, para el final)
  */
-static bool spi_receive(uint8_t *R)  {
+static bool spi_read(uint8_t *R)  {
 	bool Ret = false;
 	uint32_t Aux;
 
 #ifdef TIVA_C
 
-	if(SSIDataGetNonBlocking(SPI_BASE,&Aux))  {			//Se piden datos desde el FIFO
-		*R = (uint8_t)Aux;							//si los datos estan se pasan a la variable
-		Ret = true;							//por referencia y se devuelve TRUE
+	if(SSIDataGetNonBlocking(SPI_BASE,&Aux))  {		//Se piden datos desde el FIFO
+		*R = (uint8_t)Aux;							//los se pasan a la variable argumento
+		Ret = true;									//(por referencia) y se devuelve TRUE
 	}
-
 
 #endif
 
@@ -236,6 +242,28 @@ static void setPowerUp(bool Value)  {
 #endif
 
 }
+
+/*****************************************************************************************
+ * Funcion getAddressMatch
+ * Esta funcion es la que se encarga de setear el pin correspondiente a PWR_UP
+ *****************************************************************************************/
+static void setChipEnable(bool Value)  {
+
+#ifdef TIVA_C
+
+	if(Value)
+		GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,ON);	//CS -> High (Deshabilitado)
+	else
+		GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,OFF);	//CS -> Low (Habilitacion Negada)
+
+#endif
+#ifdef MSP430
+#endif
+#ifdef EDU_CIAA
+#endif
+
+}
+
 
 
 /*****************************************************************************************
@@ -359,6 +387,40 @@ static bool getCarrierDetect_FromIRQ(void)  {
 	return Ret;
 }
 
+
+/*****************************************************************************************
+ * Funcion spi_flush
+ * Sirve para limpiar el FIFO de entrada del HW SPI
+ *****************************************************************************************/
+static void spi_flush(void)  {
+	uint32_t Aux;
+#ifdef TIVA_C
+
+	while(SSIDataGetNonBlocking(SPI_BASE,&Aux));	//cuando devuelva 0 el FIFO esta vacio
+
+#endif
+#ifdef MSP430
+#endif
+#ifdef EDU_CIAA
+#endif
+}
+
+/*****************************************************************************************
+ * Funcion spi_wait
+ * Sirve para esperar eventos de completamiento del SPI (Hasta ahora solo para TIVA)
+ * (no es necesario en MSP430)
+ *****************************************************************************************/
+static void spi_wait(void)  {
+#ifdef TIVA_C
+
+	SysCtlDelay(1e3);		//a 50[MHz] esto es 1[ms]
+
+#endif
+#ifdef MSP430
+#endif
+#ifdef EDU_CIAA
+#endif
+}
 /*----------------------------------------------------------------------------------------
 
 		LA PROXIMA SECCION CONTIENE LAS FUNCIONES ACCESIBLES POR MODULOS EXTERNOS
@@ -431,3 +493,40 @@ void nRF905_setRXFlag(void)  {
 void nRF905_setTXFlag(void)  {
 	g_spi_Control.irqTX = true;
 }
+
+bool nRF905_setTXAddress(uint32_t Direccion)  {
+	bool Ret = false;
+
+	setChipEnable(false);		//Bajamos chip select
+	if(!spi_write(C_WRITE_TX_ADD))  {	//comando para escribir registros de direccion de TX
+		setChipEnable(true);			//excepcion
+		return Ret;
+	}
+	if(!spi_write(Direccion & 0x000000FF))  {		//byte menos significativo
+		setChipEnable(true);			//excepcion
+		return Ret;
+	}
+	if(!spi_write((Direccion >> 8) & 0x000000FF)){	//segundo byte
+		setChipEnable(true);			//excepcion
+		return Ret;
+	}
+	if(!spi_write((Direccion >> 16) & 0x000000FF))  {	//tercer byte
+		setChipEnable(true);			//excepcion
+		return Ret;
+	}
+	if(!spi_write((Direccion >> 24) & 0x000000FF))  {	//Byte mas significativo
+		setChipEnable(true);			//excepcion
+		return Ret;
+	}
+	spi_wait();								//espera (solo para tiva)
+	spi_flush();							//No nos interesa nada de lo que haya entrado
+
+	setChipEnable(true);					//termino la transaccion
+	g_nRF905_Config.DireccionTX = Direccion;	//keep track of TX address
+	Ret = true;
+	return Ret;
+}
+
+
+
+
