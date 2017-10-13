@@ -30,6 +30,9 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/gpio.h"
 #include "driverlib/ssi.h"
+#include "driverlib/interrupt.h"
+#include "nRF905.h"
+#include "inc/tm4c1233h6pm.h"
 
 //*****************************************************************************
 //
@@ -75,6 +78,15 @@ __error__(char *pcFilename, uint32_t ui32Line)
 }
 #endif
 
+
+
+void SSI0_ISR(void)  {
+	SSIIntClear(SPI_BASE,SSI_TXFF);
+	nRF905_setTXFlag();		//la transmision se completo
+}
+
+
+
 //*****************************************************************************
 //
 // Main 'C' Language entry point.  Toggle an LED using TivaWare.
@@ -98,7 +110,7 @@ int main(void)  {
     //--------------------------------------------------------------------------------------
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);				//Habilitacion del Puerto A
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);					//habilitacion de SSI0 para Touch resistivo (TSC2046)
-    GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5);
+    GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_2 | GPIO_PIN_4 | GPIO_PIN_5);
     //Supuestamente ya todos los pines SSI0 estan configurados como
     //SSI al momento de un reset, por lo que no configuro mas nada
     /*
@@ -107,6 +119,8 @@ int main(void)  {
      * PA4 -> RX (MISO)
      * PA5 -> TX (MOSI)
      */
+
+    GPIOPinTypeGPIOOutput(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO);
 
     //--------------------------------------------------------------------------------------
     // Configuracion para el Puerto B
@@ -127,6 +141,8 @@ int main(void)  {
     //Configuracion del modulo SSI0 para utilizar nrf905. Modo master, Protocolo Motorola (0,0), Bitrate 1[MHz] 8bit frame
     SSIEnable(SSI0_BASE);	//habilitacion del modulo SSI0
 
+
+
     strcpy(Mensaje,"Hola mundo como estas?");
 
     while(1)  {
@@ -134,11 +150,7 @@ int main(void)  {
     	GPIOPinWrite(GPIO_PORTB_BASE,PWR_UP,ON);
     	GPIOPinWrite(GPIO_PORTB_BASE,TX_EN,ON);
 
-    	i = 0;
-    	while(Mensaje[i] != 0)  {
-    		SSIDataPut(SSI0_BASE,Mensaje[i]);
-    		i++;
-    	}
+    	nRF905_setTXAddress(0x123B56FF);
 
     	GPIOPinWrite(GPIO_PORTB_BASE,TRX_CE,ON);
     	SysCtlDelay(200);

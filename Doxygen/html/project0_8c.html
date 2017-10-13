@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>nRF905 Driver: Referencia del Archivo src/project0.c</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">nRF905 Driver
+   &#160;<span id="projectnumber">V0.1</span>
+   </div>
+   <div id="projectbrief">Estos son los drivers para usar el modulo nRF905</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generado por Doxygen 1.8.13 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Buscar');
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Buscar');
+  $(document).ready(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#define-members">defines</a> &#124;
+<a href="#func-members">Funciones</a>  </div>
+  <div class="headertitle">
+<div class="title">Referencia del Archivo project0.c</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &lt;stdint.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &quot;inc/hw_types.h&quot;</code><br />
+<code>#include &quot;inc/hw_memmap.h&quot;</code><br />
+<code>#include &quot;driverlib/sysctl.h&quot;</code><br />
+<code>#include &quot;driverlib/gpio.h&quot;</code><br />
+<code>#include &quot;driverlib/ssi.h&quot;</code><br />
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+defines</h2></td></tr>
+<tr class="memitem:a624a25f5fe142d413d04d7a4991df1ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a624a25f5fe142d413d04d7a4991df1ed">ADDRESS_MATCH</a>&#160;&#160;&#160;GPIO_PIN_2</td></tr>
+<tr class="separator:a624a25f5fe142d413d04d7a4991df1ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fb916e86eee9bc7a2c2924d6e9d65f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a8fb916e86eee9bc7a2c2924d6e9d65f3">DATA_READY</a>&#160;&#160;&#160;GPIO_PIN_6</td></tr>
+<tr class="separator:a8fb916e86eee9bc7a2c2924d6e9d65f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dd72319c2220fe791143abd24e45be9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a9dd72319c2220fe791143abd24e45be9">CARRIER_DETECT</a>&#160;&#160;&#160;GPIO_PIN_7</td></tr>
+<tr class="separator:a9dd72319c2220fe791143abd24e45be9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2459139f4021f503a55dead016ef3164"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a2459139f4021f503a55dead016ef3164">TRX_CE</a>&#160;&#160;&#160;GPIO_PIN_0</td></tr>
+<tr class="separator:a2459139f4021f503a55dead016ef3164"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0dbd9e4c17ba0db357fcb2cedd4aa6d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#af0dbd9e4c17ba0db357fcb2cedd4aa6d">PWR_UP</a>&#160;&#160;&#160;GPIO_PIN_1</td></tr>
+<tr class="separator:af0dbd9e4c17ba0db357fcb2cedd4aa6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4c2e88d27ad426f32e943e7e56ba110"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#ae4c2e88d27ad426f32e943e7e56ba110">TX_EN</a>&#160;&#160;&#160;GPIO_PIN_5</td></tr>
+<tr class="separator:ae4c2e88d27ad426f32e943e7e56ba110"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49b5673d6140dcf51fecee788173c65b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a49b5673d6140dcf51fecee788173c65b">SSI0_FREC</a>&#160;&#160;&#160;1e6</td></tr>
+<tr class="separator:a49b5673d6140dcf51fecee788173c65b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2be603e777515f306dcdf4c3b3668a81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a2be603e777515f306dcdf4c3b3668a81">SSI0_DATAW</a>&#160;&#160;&#160;8</td></tr>
+<tr class="separator:a2be603e777515f306dcdf4c3b3668a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad76d1750a6cdeebd506bfcd6752554d2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#ad76d1750a6cdeebd506bfcd6752554d2">ON</a>&#160;&#160;&#160;0xFF</td></tr>
+<tr class="separator:ad76d1750a6cdeebd506bfcd6752554d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29e413f6725b2ba32d165ffaa35b01e5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a29e413f6725b2ba32d165ffaa35b01e5">OFF</a>&#160;&#160;&#160;0x00</td></tr>
+<tr class="separator:a29e413f6725b2ba32d165ffaa35b01e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Funciones</h2></td></tr>
+<tr class="memitem:a840291bc02cba5474a4cb46a9b9566fe"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="project0_8c.html#a840291bc02cba5474a4cb46a9b9566fe">main</a> (void)</td></tr>
+<tr class="separator:a840291bc02cba5474a4cb46a9b9566fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Documentación de los 'defines'</h2>
+<a id="a624a25f5fe142d413d04d7a4991df1ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a624a25f5fe142d413d04d7a4991df1ed">&#9670;&nbsp;</a></span>ADDRESS_MATCH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ADDRESS_MATCH&#160;&#160;&#160;GPIO_PIN_2</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9dd72319c2220fe791143abd24e45be9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dd72319c2220fe791143abd24e45be9">&#9670;&nbsp;</a></span>CARRIER_DETECT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CARRIER_DETECT&#160;&#160;&#160;GPIO_PIN_7</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8fb916e86eee9bc7a2c2924d6e9d65f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8fb916e86eee9bc7a2c2924d6e9d65f3">&#9670;&nbsp;</a></span>DATA_READY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DATA_READY&#160;&#160;&#160;GPIO_PIN_6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a29e413f6725b2ba32d165ffaa35b01e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29e413f6725b2ba32d165ffaa35b01e5">&#9670;&nbsp;</a></span>OFF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define OFF&#160;&#160;&#160;0x00</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad76d1750a6cdeebd506bfcd6752554d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad76d1750a6cdeebd506bfcd6752554d2">&#9670;&nbsp;</a></span>ON</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ON&#160;&#160;&#160;0xFF</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af0dbd9e4c17ba0db357fcb2cedd4aa6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0dbd9e4c17ba0db357fcb2cedd4aa6d">&#9670;&nbsp;</a></span>PWR_UP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PWR_UP&#160;&#160;&#160;GPIO_PIN_1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2be603e777515f306dcdf4c3b3668a81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2be603e777515f306dcdf4c3b3668a81">&#9670;&nbsp;</a></span>SSI0_DATAW</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SSI0_DATAW&#160;&#160;&#160;8</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a49b5673d6140dcf51fecee788173c65b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49b5673d6140dcf51fecee788173c65b">&#9670;&nbsp;</a></span>SSI0_FREC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SSI0_FREC&#160;&#160;&#160;1e6</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2459139f4021f503a55dead016ef3164"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2459139f4021f503a55dead016ef3164">&#9670;&nbsp;</a></span>TRX_CE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TRX_CE&#160;&#160;&#160;GPIO_PIN_0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae4c2e88d27ad426f32e943e7e56ba110"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4c2e88d27ad426f32e943e7e56ba110">&#9670;&nbsp;</a></span>TX_EN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TX_EN&#160;&#160;&#160;GPIO_PIN_5</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Documentación de las funciones</h2>
+<a id="a840291bc02cba5474a4cb46a9b9566fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a840291bc02cba5474a4cb46a9b9566fe">&#9670;&nbsp;</a></span>main()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int main </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generado por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.13
+</small></address>
+</body>
+</html>

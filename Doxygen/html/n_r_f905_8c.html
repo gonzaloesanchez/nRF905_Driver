@@ -1,0 +1,575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>nRF905 Driver: Referencia del Archivo src/nRF905.c</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr style="height: 56px;">
+  <td id="projectalign" style="padding-left: 0.5em;">
+   <div id="projectname">nRF905 Driver
+   &#160;<span id="projectnumber">V0.1</span>
+   </div>
+   <div id="projectbrief">Estos son los drivers para usar el modulo nRF905</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- Generado por Doxygen 1.8.13 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'Buscar');
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','Buscar');
+  $(document).ready(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div class="header">
+  <div class="summary">
+<a href="#func-members">Funciones</a> &#124;
+<a href="#var-members">Variables</a>  </div>
+  <div class="headertitle">
+<div class="title">Referencia del Archivo nRF905.c</div>  </div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="n_r_f905_8h_source.html">nRF905.h</a>&quot;</code><br />
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Funciones</h2></td></tr>
+<tr class="memitem:aba7f1cb042694d4bde816bf28cdc7003"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#aba7f1cb042694d4bde816bf28cdc7003">spi_write</a> (uint8_t Comando, uint16_t Dato)</td></tr>
+<tr class="memdesc:aba7f1cb042694d4bde816bf28cdc7003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Esta funcion es la que se encarga de enviar los comandos por el HW SPI.  <a href="#aba7f1cb042694d4bde816bf28cdc7003">Más...</a><br /></td></tr>
+<tr class="separator:aba7f1cb042694d4bde816bf28cdc7003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeba4ccf07b9bbf9a4f17575c353b3978"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#aeba4ccf07b9bbf9a4f17575c353b3978">spi_receive</a> (uint8_t *R)</td></tr>
+<tr class="separator:aeba4ccf07b9bbf9a4f17575c353b3978"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41c79d75c1216032795a8b633963faae"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a41c79d75c1216032795a8b633963faae">setTX_Enable</a> (bool Value)</td></tr>
+<tr class="separator:a41c79d75c1216032795a8b633963faae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99b46cecd46da5ea21bb4dbc7c23f12c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a99b46cecd46da5ea21bb4dbc7c23f12c">setTRX_ChipEnable</a> (bool Value)</td></tr>
+<tr class="separator:a99b46cecd46da5ea21bb4dbc7c23f12c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa596f8d05eafbd61343bf7c55d5f0662"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#aa596f8d05eafbd61343bf7c55d5f0662">setPowerUp</a> (bool Value)</td></tr>
+<tr class="separator:aa596f8d05eafbd61343bf7c55d5f0662"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cee7e95862029c605f6affbb9ba4165"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a0cee7e95862029c605f6affbb9ba4165">getAddressMatch</a> (void)</td></tr>
+<tr class="separator:a0cee7e95862029c605f6affbb9ba4165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae23c91df0c374c37388c9a40b3e6343c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#ae23c91df0c374c37388c9a40b3e6343c">getDataReady</a> (void)</td></tr>
+<tr class="separator:ae23c91df0c374c37388c9a40b3e6343c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb131e186be295804799b97973cee79f"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#acb131e186be295804799b97973cee79f">getCarrierDetect</a> (void)</td></tr>
+<tr class="separator:acb131e186be295804799b97973cee79f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae65940b7dcf13678b5b778620f2922bb"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#ae65940b7dcf13678b5b778620f2922bb">getAddressMatch_FromIRQ</a> (void)</td></tr>
+<tr class="separator:ae65940b7dcf13678b5b778620f2922bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac16757e667563cb67bf792d0de51b877"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#ac16757e667563cb67bf792d0de51b877">getDataReady_FromIRQ</a> (void)</td></tr>
+<tr class="separator:ac16757e667563cb67bf792d0de51b877"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa925c45b5506eee2be6bf038d133f4dd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#aa925c45b5506eee2be6bf038d133f4dd">getCarrierDetect_FromIRQ</a> (void)</td></tr>
+<tr class="separator:aa925c45b5506eee2be6bf038d133f4dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a447904a4651caa27c65e3aa442f102af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a447904a4651caa27c65e3aa442f102af">nRF905_getStatusReg</a> (uint8_t *status)</td></tr>
+<tr class="separator:a447904a4651caa27c65e3aa442f102af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a279fb401879345dd4a0bbf1242da28de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a279fb401879345dd4a0bbf1242da28de">nRF905_Init</a> (void)</td></tr>
+<tr class="separator:a279fb401879345dd4a0bbf1242da28de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7c00bfa33ecddcfa349862d2e112499"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#ad7c00bfa33ecddcfa349862d2e112499">nRF905_setRXFlag</a> (void)</td></tr>
+<tr class="separator:ad7c00bfa33ecddcfa349862d2e112499"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0548b5a5a718767e5d9ec8d22c1fad21"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a0548b5a5a718767e5d9ec8d22c1fad21">nRF905_setTXFlag</a> (void)</td></tr>
+<tr class="separator:a0548b5a5a718767e5d9ec8d22c1fad21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a5408273f38aa231237d0532456d21d6a"><td class="memItemLeft" align="right" valign="top">static uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a5408273f38aa231237d0532456d21d6a">g_ui8StatusReg</a></td></tr>
+<tr class="memdesc:a5408273f38aa231237d0532456d21d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modulo que implementa el driver para nRF905. Este modulo define las funciones necesarias para implementar comunicaciones con el modulo RF basado en el chip nRF905 de NORDIC. Se deben tener ciertos cuidados para cada plataforma: Esta libreria utiliza interrupciones, asi que estas deben ser configuradas fuera de la libreria, para cada plataforma. Eso da mas claridad y generalidad a la misma (y el control del hardware lo tiene el programador). Al utilizar interrupciones y modos de bajo consumo, es necesario que se configure adecuadamente el clocking al HW del SPI (algunos modos de bajo consumo quitan la fuente de clock a los perifericos para ahorrar energia)  <a href="#a5408273f38aa231237d0532456d21d6a">Más...</a><br /></td></tr>
+<tr class="separator:a5408273f38aa231237d0532456d21d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30cfb3a49ecc5fcd59dbbbdd33f8dfb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="n_r_f905_8h.html#a545473808e82a3b9924ab09627b211eb">nRF905</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a30cfb3a49ecc5fcd59dbbbdd33f8dfb4">g_nRF905_Config</a></td></tr>
+<tr class="separator:a30cfb3a49ecc5fcd59dbbbdd33f8dfb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9988e20a1a5a15d18576671ad81f418c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="n_r_f905_8h.html#a7131494ed671885b953298a79ce219ed">spi_flags</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="n_r_f905_8c.html#a9988e20a1a5a15d18576671ad81f418c">g_spi_Control</a></td></tr>
+<tr class="separator:a9988e20a1a5a15d18576671ad81f418c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Documentación de las funciones</h2>
+<a id="a0cee7e95862029c605f6affbb9ba4165"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cee7e95862029c605f6affbb9ba4165">&#9670;&nbsp;</a></span>getAddressMatch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getAddressMatch </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae65940b7dcf13678b5b778620f2922bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae65940b7dcf13678b5b778620f2922bb">&#9670;&nbsp;</a></span>getAddressMatch_FromIRQ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getAddressMatch_FromIRQ </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb131e186be295804799b97973cee79f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb131e186be295804799b97973cee79f">&#9670;&nbsp;</a></span>getCarrierDetect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getCarrierDetect </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa925c45b5506eee2be6bf038d133f4dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa925c45b5506eee2be6bf038d133f4dd">&#9670;&nbsp;</a></span>getCarrierDetect_FromIRQ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getCarrierDetect_FromIRQ </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae23c91df0c374c37388c9a40b3e6343c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae23c91df0c374c37388c9a40b3e6343c">&#9670;&nbsp;</a></span>getDataReady()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getDataReady </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac16757e667563cb67bf792d0de51b877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac16757e667563cb67bf792d0de51b877">&#9670;&nbsp;</a></span>getDataReady_FromIRQ()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool getDataReady_FromIRQ </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a447904a4651caa27c65e3aa442f102af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a447904a4651caa27c65e3aa442f102af">&#9670;&nbsp;</a></span>nRF905_getStatusReg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool nRF905_getStatusReg </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>status</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a279fb401879345dd4a0bbf1242da28de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a279fb401879345dd4a0bbf1242da28de">&#9670;&nbsp;</a></span>nRF905_Init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nRF905_Init </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad7c00bfa33ecddcfa349862d2e112499"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7c00bfa33ecddcfa349862d2e112499">&#9670;&nbsp;</a></span>nRF905_setRXFlag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nRF905_setRXFlag </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Funcion para setear la bandera de interrupcion de RX. La encapsulo para no tener variables globales definidas en este modulo dando vueltas en el proyecto </p>
+
+</div>
+</div>
+<a id="a0548b5a5a718767e5d9ec8d22c1fad21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0548b5a5a718767e5d9ec8d22c1fad21">&#9670;&nbsp;</a></span>nRF905_setTXFlag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nRF905_setTXFlag </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Funcion para setear la bandera de interrupcion de TX. La encapsulo para no tener variables globales definidas en este modulo dando vueltas en el proyecto </p>
+
+</div>
+</div>
+<a id="aa596f8d05eafbd61343bf7c55d5f0662"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa596f8d05eafbd61343bf7c55d5f0662">&#9670;&nbsp;</a></span>setPowerUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void setPowerUp </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a99b46cecd46da5ea21bb4dbc7c23f12c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99b46cecd46da5ea21bb4dbc7c23f12c">&#9670;&nbsp;</a></span>setTRX_ChipEnable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void setTRX_ChipEnable </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a41c79d75c1216032795a8b633963faae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41c79d75c1216032795a8b633963faae">&#9670;&nbsp;</a></span>setTX_Enable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void setTX_Enable </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Esta funcion es la que se encarga de setear el pin correspondiente a TX_EN </p>
+
+</div>
+</div>
+<a id="aeba4ccf07b9bbf9a4f17575c353b3978"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeba4ccf07b9bbf9a4f17575c353b3978">&#9670;&nbsp;</a></span>spi_receive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool spi_receive </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>R</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Esta funcion es la que se encarga de recibir los datos por el HW SPI, haciendo un read. Toma como argumento un puntero a la variable que contendra el valor recibido. Devuelve true si la recepcion fue exitosa, o false en caso contrario. Esta funcion se implementa con funciones NO BLOQUEANTES. Las causas de falla normalmente son que no haya nada en el FIFO </p>
+
+</div>
+</div>
+<a id="aba7f1cb042694d4bde816bf28cdc7003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba7f1cb042694d4bde816bf28cdc7003">&#9670;&nbsp;</a></span>spi_write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool spi_write </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>Comando</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>Dato</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Esta funcion es la que se encarga de enviar los comandos por el HW SPI. </p>
+<p>La funcion debe ser implementada para cada HW distinto. </p><div class="fragment"><div class="line">USAR INTERRUPCIONES</div><div class="line"><span class="keywordflow">while</span>(variable_global)  {</div><div class="line">    WFI;</div><div class="line">}</div></div><!-- fragment --><p> <code>variable_global</code> podra ser cambiada por software para dar portabilidad </p><dl class="params"><dt>Parámetros</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Comando</td><td>Es el comando a enviar. Los comandos son: (Agregar tabla de comandos) </td></tr>
+    <tr><td class="paramname">Dato</td><td>Es el parametro a enviar para configurar el modulo nRF905 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Devuelve</dt><dd>La funcion devuelve <code>TRUE</code> si el envio fue exitoso o <code>FALSE</code> en caso contrario </dd></dl>
+<dl class="section note"><dt>Nota</dt><dd>Esta funcion se implementa con funciones NO BLOQUEANTES. </dd></dl>
+<dl class="section warning"><dt>Atención</dt><dd>Las causas de falla normalmente son que no haya lugar en el FIFO. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Documentación de las variables</h2>
+<a id="a30cfb3a49ecc5fcd59dbbbdd33f8dfb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30cfb3a49ecc5fcd59dbbbdd33f8dfb4">&#9670;&nbsp;</a></span>g_nRF905_Config</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="n_r_f905_8h.html#a545473808e82a3b9924ab09627b211eb">nRF905</a> g_nRF905_Config</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9988e20a1a5a15d18576671ad81f418c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9988e20a1a5a15d18576671ad81f418c">&#9670;&nbsp;</a></span>g_spi_Control</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="n_r_f905_8h.html#a7131494ed671885b953298a79ce219ed">spi_flags</a> g_spi_Control</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5408273f38aa231237d0532456d21d6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5408273f38aa231237d0532456d21d6a">&#9670;&nbsp;</a></span>g_ui8StatusReg</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t g_ui8StatusReg</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Modulo que implementa el driver para nRF905. Este modulo define las funciones necesarias para implementar comunicaciones con el modulo RF basado en el chip nRF905 de NORDIC. Se deben tener ciertos cuidados para cada plataforma: Esta libreria utiliza interrupciones, asi que estas deben ser configuradas fuera de la libreria, para cada plataforma. Eso da mas claridad y generalidad a la misma (y el control del hardware lo tiene el programador). Al utilizar interrupciones y modos de bajo consumo, es necesario que se configure adecuadamente el clocking al HW del SPI (algunos modos de bajo consumo quitan la fuente de clock a los perifericos para ahorrar energia) </p>
+<p>Definiciones globales de este modulo, no visibles hacia afuera </p>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+Generado por &#160;<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/>
+</a> 1.8.13
+</small></address>
+</body>
+</html>
