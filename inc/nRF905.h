@@ -12,17 +12,17 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
+/**
+ * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
+ */
+#define EDU_CIAA
+
 /**
  * @brief Definiciones generales para el proyecto.
  * Aqui se define la frecuencia de SPI y ancho en bits de los paquetes que son enviados por
  * el bus SPI. Ademas de definirse algunas constantes de uso como ser @c ON y @c OFF
  */
-
-#define SPI_FREC		1e6		/**<Constante numerica para 1[MHz]*/
-#define	SPI_DATAWIDTH	8		/**<Longitud en bits de la transferencia*/
-
-#define ON				0xFF
-#define OFF				0x00
 
 #define C_WRITE_TX_ADD	0x22	//Comando SPI para escribir la direccion donde transmitir
 
@@ -43,6 +43,11 @@
 #include "driverlib/ssi.h"
 #include "driverlib/sysctl.h"
 
+#define SPI_FREC		1e6		/**<Constante numerica para 1[MHz]*/
+#define	SPI_DATAWIDTH	8		/**<Longitud en bits de la transferencia*/
+
+#define ON				0xFF
+#define OFF				0x00
 
 /**
  * Definiciones de hardware para pines
@@ -79,6 +84,59 @@
 #endif
 
 #ifdef EDU_CIAA
+/**
+ * Includes especificos para Edu CIAA
+ */
+#include "chip.h"
+
+/**
+ * Definiciones de hardware para pines
+ */
+
+//GPIO0 = PWR_UP
+#define PWR_UP_P    		6
+#define PWR_UP_P_   		1
+#define PWR_UP_GPIO 		3
+#define PWR_UP_PIN  		0
+
+//GPIO1 = ADDRESS_MATCH
+#define ADDRESS_MATCH_P    	6
+#define ADDRESS_MATCH_P_   	4
+#define ADDRESS_MATCH_GPIO 	3
+#define ADDRESS_MATCH_PIN  	3
+
+//GPIO2 = DATA_READY
+#define DATA_READY_P    	6
+#define DATA_READY_P_   	5
+#define DATA_READY_GPIO 	3
+#define DATA_READY_PIN  	4
+
+//GPIO3 = CARRIER_DETECT
+#define CARRIER_DETECT_P    6
+#define CARRIER_DETECT_P_  	7
+#define CARRIER_DETECT_GPIO 5
+#define CARRIER_DETECT_PIN 	15
+
+//GPIO4 = CHIP_ENABLE
+#define CHIP_ENABLE_P    	6
+#define CHIP_ENABLE_P_  	8
+#define CHIP_ENABLE_GPIO 	5
+#define CHIP_ENABLE_PIN 	16
+
+//GPIO5 = TX_EN
+#define TX_EN_P    			6
+#define TX_EN_P_  			9
+#define TX_EN_GPIO 			3
+#define TX_EN_PIN 			5
+
+
+//GPIO6 = TRX_CE
+#define TRX_CE_P    		6
+#define TRX_CE_P_  			10
+#define TRX_CE_GPIO 		3
+#define TRX_CE_PIN 			6
+
+
 #endif
 
 
