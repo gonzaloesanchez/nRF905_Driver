@@ -218,6 +218,15 @@ static void spi_wait(void)  {
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+	uint32_t i;
+
+	/*
+	 * Toda la transmision de SPI es bloqueante con las funciones utilizadas, asi que esto
+	 * no afecta. Es para que el CS no se ponga en idle antes de cumplido el Tcch despues
+	 * del ultimo clock. La constante es empirica
+	 */
+	for(i=0;i<TCCH_NRF905;i++);
+
 #endif
 }
 
@@ -466,6 +475,14 @@ void nRF905_setTXFlag(void)  {
 	g_spi_Control.irqTX = true;
 }
 
+
+/**
+ * @brief Esta funcion envia el comando correspondiente a setear la direccion a la cual se transmite.
+ *
+ * @param Direccion es un valor de 32bits donde seran enviados los datos via RF
+ * @return La funcion devuelve @p TRUE si el envio fue exitoso o @p FALSE en caso contrario
+ * @warning Las causas de falla normalmente son que no haya lugar en el FIFO.
+ */
 bool nRF905_setTXAddress(uint32_t Direccion)  {
 	bool Ret = false;
 

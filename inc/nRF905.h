@@ -89,6 +89,8 @@
  */
 #include "chip.h"
 
+#define	TCCH_NRF905			1020
+
 /**
  * Definiciones de hardware para pines
  */
