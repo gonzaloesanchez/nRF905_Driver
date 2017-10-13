@@ -38,7 +38,7 @@ static uint8_t g_ui8StatusReg;	//esta variable contiene status despues de cada
 								//transicion bajo-alto de CD
 
 
-nRF905 g_nRF905_Config;			//variable global que contiene toda la configuracion
+static nRF905 g_nRF905_Config;	//variable global que contiene toda la configuracion
 								//del dispositivo.
 								//Todas las funciones de configuracion tendran esta
 								//estructura como argumento
@@ -356,59 +356,79 @@ static bool getCarrierDetect(void)  {
 }
 
 
-/*****************************************************************************************
- * Funcion getAddressMatch_FromIRQ
- *****************************************************************************************/
-static bool getAddressMatch_FromIRQ(void)  {
-	bool Ret = false;
-
-	if(g_nRF905_Config.AM)
-		Ret = true;
-
-	//TODO: Si es necesario, codificar aqui para HW limitado
-
-	return Ret;
-}
-
-
-/*****************************************************************************************
- * Funcion getDataReady_FromIRQ
- *****************************************************************************************/
-static bool getDataReady_FromIRQ(void)  {
-	bool Ret = false;
-
-	if(g_nRF905_Config.DR)
-		Ret = true;
-
-	//TODO: Si es necesario, codificar aqui para HW limitado
-
-	return Ret;
-}
-
-
-/*****************************************************************************************
- * Funcion getCarrierDetect_FromIRQ
- *****************************************************************************************/
-static bool getCarrierDetect_FromIRQ(void)  {
-	bool Ret = false;
-
-	if(g_nRF905_Config.CD)
-		Ret = true;
-
-	//TODO: Si es necesario, codificar aqui para HW limitado
-
-	return Ret;
-}
-
-
-
-
 
 /*----------------------------------------------------------------------------------------
 
 		LA PROXIMA SECCION CONTIENE LAS FUNCIONES ACCESIBLES POR MODULOS EXTERNOS
 
 ----------------------------------------------------------------------------------------*/
+
+
+/*****************************************************************************************
+ * Funcion getAddressMatch_FromIRQ
+ *****************************************************************************************/
+bool getAddressMatch_FromIRQ(void)  {
+
+	return g_nRF905_Config.AM;
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+}
+
+/*****************************************************************************************
+ * Funcion setAddressMatch_FromIRQ
+ *****************************************************************************************/
+void setAddressMatch_FromIRQ(bool X)  {
+
+	g_nRF905_Config.AM = X;
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+}
+
+
+/*****************************************************************************************
+ * Funcion getDataReady_FromIRQ
+ *****************************************************************************************/
+bool getDataReady_FromIRQ(void)  {
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+	return g_nRF905_Config.DR;
+}
+
+/*****************************************************************************************
+ * Funcion getDataReady_FromIRQ
+ *****************************************************************************************/
+void setDataReady_FromIRQ(bool X)  {
+
+	g_nRF905_Config.DR = X;
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+}
+
+
+/*****************************************************************************************
+ * Funcion getCarrierDetect_FromIRQ
+ *****************************************************************************************/
+bool getCarrierDetect_FromIRQ(void)  {
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+	return g_nRF905_Config.CD;
+}
+
+/*****************************************************************************************
+ * Funcion getCarrierDetect_FromIRQ
+ *****************************************************************************************/
+void setCarrierDetect_FromIRQ(bool X)  {
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+	g_nRF905_Config.CD = X;
+
+}
+
+
 
 /*
  * Esta funcion devuelve el valor de la variable interna al modulo. Asi la hacemos
@@ -516,6 +536,50 @@ bool nRF905_setTXAddress(uint32_t Direccion)  {
 	return Ret;
 }
 
+bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes)  {
+	bool Ret = false;
+
+
+	/*
+	 * code goes here
+	 */
+
+	return Ret;
+}
+
+bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
+	bool Ret = false;
+
+
+	/*
+	 * code goes here
+	 */
+
+	return Ret;
+}
+
+
+bool nRF905_ChanelConfig(void)  {
+	bool Ret = false;
+
+
+	/*
+	 * code goes here
+	 */
+
+	return Ret;
+}
+
+bool nRF905_WriteConfig(void)  {
+	bool Ret = false;
+
+
+	/*
+	 * code goes here
+	 */
+
+	return Ret;
+}
 
 
 

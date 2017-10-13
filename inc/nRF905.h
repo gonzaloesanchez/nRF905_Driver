@@ -33,53 +33,6 @@
  * PREDEFINED SYMBOLS. Equivale a --define HW_PLATFORM para compilar en linea de comandos
  */
 
-#ifdef TIVA_C
-
-/**
- * Includes especificos para TivaC
- */
-#include "inc/hw_memmap.h"
-#include "driverlib/gpio.h"
-#include "driverlib/ssi.h"
-#include "driverlib/sysctl.h"
-
-#define SPI_FREC		1e6		/**<Constante numerica para 1[MHz]*/
-#define	SPI_DATAWIDTH	8		/**<Longitud en bits de la transferencia*/
-
-#define ON				0xFF
-#define OFF				0x00
-
-/**
- * Definiciones de hardware para pines
- */
-#define TX_EN_BASE				GPIO_PORTB_BASE
-#define TX_EN_GPIO				GPIO_PIN_5
-
-#define TRX_CE_BASE				GPIO_PORTB_BASE
-#define TRX_CE_GPIO				GPIO_PIN_0
-
-#define PWR_UP_BASE				GPIO_PORTB_BASE
-#define PWR_UP_GPIO				GPIO_PIN_1
-
-#define ADDRESS_MATCH_BASE		GPIO_PORTB_BASE
-#define ADDRESS_MATCH_GPIO		GPIO_PIN_2
-
-#define DATA_READY_BASE			GPIO_PORTB_BASE
-#define DATA_READY_GPIO			GPIO_PIN_6
-
-#define CARRIER_DETECT_BASE		GPIO_PORTB_BASE
-#define CARRIER_DETECT_GPIO		GPIO_PIN_7
-
-#define CHIP_ENABLE_BASE		GPIO_PORTA_BASE
-#define CHIP_ENABLE_GPIO		GPIO_PIN_3
-/**
- * Definiciones de hardware para SPI
- */
-
-#define SPI_BASE				SSI0_BASE
-
-#endif
-
 #ifdef MSP430
 #endif
 
@@ -178,12 +131,22 @@ struct _spi_flags  {
 typedef struct _nRF905 nRF905;
 typedef struct _spi_flags spi_flags;
 
-extern nRF905 g_nRF905_Config;
+//extern nRF905 g_nRF905_Config;
 
+bool getAddressMatch_FromIRQ(void);
+void setAddressMatch_FromIRQ(bool X);
+bool getDataReady_FromIRQ(void);
+void setDataReady_FromIRQ(bool X);
+bool getCarrierDetect_FromIRQ(void);
+void setCarrierDetect_FromIRQ(bool X);
+
+void nRF905_Init(void);
 void nRF905_setTXFlag(void);
 bool nRF905_setTXAddress(uint32_t Direccion);
+bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes);
+bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes);
+bool nRF905_ChanelConfig(void);
+bool nRF905_WriteConfig(void);
 
-void escribir(void);
-void leer(void);
 
 #endif /* NRF905_H_ */
