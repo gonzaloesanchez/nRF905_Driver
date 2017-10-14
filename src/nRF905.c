@@ -457,16 +457,22 @@ void nRF905_Init(void)  {
 
 	//TODO: Modificar valores!! Definir constantes para cada caso.
 	//Estos valores no son correctos
-	g_nRF905_Config.Canal = 0;
-	g_nRF905_Config.ClockModulo = 0;
+	g_nRF905_Config.Canal = DEFAULT_CHANNEL;
+	g_nRF905_Config.ClockModulo = XOF_16MHZ;
 	g_nRF905_Config.ClockOut = false;
+	g_nRF905_Config.ClockOut_Freq = CLKOUT_500KHZ;		//este valor es ignorado al estar deshabilitada esta funcion
 	g_nRF905_Config.DireccionRX = 0xFFFFFFFF;
 	g_nRF905_Config.DireccionTX = 0xFFFFFFFF;
-	g_nRF905_Config.LongRX_Payload = 0;
-	g_nRF905_Config.LongTX_Payload = 0;
-	g_nRF905_Config.PLL_Freq = 0;
-	g_nRF905_Config.Potencia = 0;
+	g_nRF905_Config.LongRX_Payload = MAX_TX_RX_PAYLOAD;
+	g_nRF905_Config.LongTX_Payload = MAX_TX_RX_PAYLOAD;
+	g_nRF905_Config.PLL_Freq = HFREQ_PLL_433;
+	g_nRF905_Config.Potencia = PA_PWR_PLUS_10DBM;
 	g_nRF905_Config.Retransmision = false;
+	g_nRF905_Config.Potencia_Rx = false;
+	g_nRF905_Config.LongRX_Address = 4;
+	g_nRF905_Config.LongTX_Address = 4;
+	g_nRF905_Config.CRC_Enable = true;
+	g_nRF905_Config.CRC_Mode = CRC16_MODE;
 
 
 #ifdef MSP430
@@ -507,7 +513,7 @@ bool nRF905_setTXAddress(uint32_t Direccion)  {
 	bool Ret = false;
 
 	setChipEnable(false);		//Bajamos chip select
-	if(!spi_write(C_WRITE_TX_ADD))  {	//comando para escribir registros de direccion de TX
+	if(!spi_write(C_WRITE_TX_ADDRR))  {	//comando para escribir registros de direccion de TX
 		setChipEnable(true);			//excepcion
 		return Ret;
 	}
@@ -538,22 +544,57 @@ bool nRF905_setTXAddress(uint32_t Direccion)  {
 
 bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes)  {
 	bool Ret = false;
+	uint8_t i;
 
+	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+		setChipEnable(false);		//Bajamos chip select
+		if(!spi_write(C_WRITE_TX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
 
-	/*
-	 * code goes here
-	 */
+		for (i=0;i<cant_bytes;i++) {
+			if(!spi_write(data_tx[i]))  {	//comando para escribir registros de direccion de TX
+				setChipEnable(true);		//excepcion
+				return Ret;
+			}
+		}
+
+		spi_wait();								//espera para sincronizar ultimo clock y CS high
+		spi_flush();							//No nos interesa nada de lo que haya entrado
+
+		setChipEnable(true);					//termino la transaccion
+		Ret = true;
+	}
+
 
 	return Ret;
 }
 
 bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 	bool Ret = false;
+	uint8_t i;
 
+	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+		setChipEnable(false);		//Bajamos chip select
+		if(!spi_write(C_READ_RX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
 
-	/*
-	 * code goes here
-	 */
+		for (i=0;i<cant_bytes;i++) {
+			if(!spi_write(data_rx[i]))  {	//comando para escribir registros de direccion de TX
+				setChipEnable(true);		//excepcion
+				return Ret;
+			}
+		}
+
+		spi_wait();								//espera para sincronizar ultimo clock y CS high
+		spi_flush();							//No nos interesa nada de lo que haya entrado
+
+		setChipEnable(true);					//termino la transaccion
+		Ret = true;
+	}
 
 	return Ret;
 }
@@ -561,22 +602,67 @@ bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 
 bool nRF905_ChanelConfig(void)  {
 	bool Ret = false;
+	uint8_t cc_MSB,cc_LSB;
 
 
-	/*
-	 * code goes here
-	 */
+	cc_MSB = CONFIG_MASK | (g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
+				((g_nRF905_Config.Canal & 0x100000000) >> 8);
+	cc_LSB = g_nRF905_Config.Canal & 0xFF;
+
+	setChipEnable(false);		//Bajamos chip select
+	if(!spi_write(cc_MSB))  {	//comando para configurar el canal (el comando esta incluido en CONFIG_MASK)
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+	if(!spi_write(cc_LSB))  {	//parte baja del comando config channel
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+
+	spi_wait();								//espera para sincronizar ultimo clock y CS high
+	spi_flush();							//No nos interesa nada de lo que haya entrado
+
+	setChipEnable(true);					//termino la transaccion
+	Ret = true;
 
 	return Ret;
 }
 
 bool nRF905_WriteConfig(void)  {
 	bool Ret = false;
+	uint8_t config_reg[CONFIG_REG_LENGTH];
+	uint8_t i;
+
+	config_reg[0] = g_nRF905_Config.Canal & 0xFF;
+	config_reg[1] = (g_nRF905_Config.Retransmision << 5) | (g_nRF905_Config.Potencia_Rx << 4) |
+					(g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
+					((g_nRF905_Config.Canal & 0x100000000) >> 8);
+	config_reg[2] = (g_nRF905_Config.LongTX_Address << 4) | g_nRF905_Config.LongRX_Address;
+	config_reg[3] = g_nRF905_Config.LongRX_Payload;
+	config_reg[4] = g_nRF905_Config.LongTX_Payload;
+
+	config_reg[5] = g_nRF905_Config.DireccionRX & 0xFF;
+	config_reg[6] = (g_nRF905_Config.DireccionRX >> 8) & 0xFF;
+	config_reg[7] = (g_nRF905_Config.DireccionRX >> 16) & 0xFF;
+	config_reg[8] = (g_nRF905_Config.DireccionRX >> 24) & 0xFF;
+	config_reg[9] = (g_nRF905_Config.CRC_Mode << 7) | (g_nRF905_Config.CRC_Enable << 6) |
+					(g_nRF905_Config.ClockModulo << 3) | (g_nRF905_Config.ClockOut << 2)|
+					g_nRF905_Config.ClockOut_Freq;
 
 
-	/*
-	 * code goes here
-	 */
+	setChipEnable(false);		//Bajamos chip select
+	for(i=0;i<CONFIG_REG_LENGTH;i++)  {
+		if(!spi_write(config_reg[i]))  {	//comando para escribir en el registro de configuracion
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
+	}
+
+	spi_wait();								//espera para sincronizar ultimo clock y CS high
+	spi_flush();							//No nos interesa nada de lo que haya entrado
+
+	setChipEnable(true);					//termino la transaccion
+	Ret = true;
 
 	return Ret;
 }

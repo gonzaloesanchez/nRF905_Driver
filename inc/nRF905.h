@@ -24,7 +24,37 @@
  * el bus SPI. Ademas de definirse algunas constantes de uso como ser @c ON y @c OFF
  */
 
-#define C_WRITE_TX_ADD	0x22	//Comando SPI para escribir la direccion donde transmitir
+#define C_WRITE_TX_ADDRR		0x22	//Comando SPI para escribir la direccion donde transmitir
+#define C_WRITE_TX_PAYLOAD		0x20	//Comando SPI para escribir los datos a transmitir
+#define C_READ_RX_PAYLOAD		0x24	//Comando SPI para leer los datos recibidos
+
+
+#define CONFIG_MASK				0x80	//mascara para el comando SPI especial ChannelConfig
+#define MAX_TX_RX_PAYLOAD		32		//ningun payload puede ser mayor a 32 bytes (dentro de esos 32bytes se
+										//implementa el protocolo que uno desee
+#define CONFIG_REG_LENGTH		10		//longitud en bytes del registro de configuracion
+#define HFREQ_PLL_433			0		//bit para especificar al PLL en que banda trabajar (433[MHz])
+#define HFREQ_PLL_868_915		1		//868[MHz] o 915[MHz]
+#define DEFAULT_CHANNEL			0x006B	//esto se utiliza en la inicializacion, corresponde a 433.1[MHz]
+
+#define XOF_4MHZ				0		//Seteos necesarios para indicar al integrado el cristal que
+#define XOF_8MHZ				1		//utiliza como base para el PLL
+#define XOF_12MHZ				2
+#define XOF_16MHZ				3
+#define XOF_20MHZ				4
+
+#define CLKOUT_4MHZ				0
+#define CLKOUT_2MHZ				1
+#define CLKOUT_1MHZ				2
+#define CLKOUT_500KHZ			3
+
+#define PA_PWR_MINUS_10DBM		0
+#define PA_PWR_MINUS_2DBM		1
+#define PA_PWR_PLUS_6DBM		2
+#define PA_PWR_PLUS_10DBM		3
+
+#define CRC16_MODE				1
+#define CRC8_MODE				0
 
 
 /**
@@ -101,17 +131,23 @@
  */
 
 struct _nRF905 {
-	uint8_t Canal;				//Canal en el que esta trabajando el modulo
+	uint16_t Canal;				//Canal en el que esta trabajando el modulo
 	uint8_t Potencia;			//potencia de transmision
-	uint8_t PLL_Freq;			//Frecuencia de PLL
+	bool PLL_Freq;			//Frecuencia de PLL
 	uint8_t Modo_Operacion;		//Modo de operacion refiere a seccion 8.2 del manual
 	bool Retransmision;			//retransmision true or false
 	bool ClockOut;				//habilitacion de clockout
+	uint8_t ClockOut_Freq;		//Frecuencia de salida del reloj producido por el modulo
+	bool Potencia_Rx;			//habilitacion de reduccion de potencia en recepcion
 	uint8_t ClockModulo;		//frecuencia de cristal utilizado para alimentar el PLL
 	uint32_t DireccionTX;		//direccion a la cual se quiere transmitir
 	uint32_t DireccionRX;		//direccion en la cual se recibiran datos
 	uint8_t LongRX_Payload;		//largo del payload RX
 	uint8_t LongTX_Payload;		//largo del payload TX
+	uint8_t LongRX_Address;		//cantidad de bytes de longitud de la direccion de recepcion
+	uint8_t LongTX_Address;		//cantidad de bytes de longitud de la direccion de transmision
+	bool CRC_Mode;				//Booleano para describir el modo crc (1 => CRC16; 0 => CRC8)
+	bool CRC_Enable;			//Habilitacion del checkeo CRC
 
 	bool CD;					//Flag Carrier Detect para interrupciones
 	bool AM;					//Flag Address Match para interrupciones
@@ -127,6 +163,7 @@ struct _spi_flags  {
 	bool irqTX;
 	bool irqRX;
 };
+
 
 typedef struct _nRF905 nRF905;
 typedef struct _spi_flags spi_flags;

@@ -216,13 +216,23 @@ void SysTick_Handler(void) {
  *          warnings or errors.
  */
 int main(void)  {
-
-	/* perform the needed initialization here */
+	uint8_t aux[32];
+	uint8_t i;
 
 	initHardware();
 
+	aux[0] = 8;
+	for(i=1;i<8;i++)  {
+		aux[i] = i*3;
+	}
+
 	nRF905_Init();
 	nRF905_setTXAddress(0x123B56FF);
+	nRF905_ChanelConfig();
+	nRF905_RxPayload_rd(aux,8);
+	nRF905_TxPayload_wr(aux,8);
+
+	nRF905_WriteConfig();
 
 	while(1) {
 
