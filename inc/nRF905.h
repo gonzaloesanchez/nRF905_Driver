@@ -12,19 +12,49 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
+/**
+ * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
+ */
+#define EDU_CIAA
+
 /**
  * @brief Definiciones generales para el proyecto.
  * Aqui se define la frecuencia de SPI y ancho en bits de los paquetes que son enviados por
  * el bus SPI. Ademas de definirse algunas constantes de uso como ser @c ON y @c OFF
  */
 
-#define SPI_FREC		1e6		/**<Constante numerica para 1[MHz]*/
-#define	SPI_DATAWIDTH	8		/**<Longitud en bits de la transferencia*/
+#define C_WRITE_TX_ADDRR		0x22	//Comando SPI para escribir la direccion donde transmitir
+#define C_WRITE_TX_PAYLOAD		0x20	//Comando SPI para escribir los datos a transmitir
+#define C_READ_RX_PAYLOAD		0x24	//Comando SPI para leer los datos recibidos
 
-#define ON				0xFF
-#define OFF				0x00
 
-#define C_WRITE_TX_ADD	0x22	//Comando SPI para escribir la direccion donde transmitir
+#define CONFIG_MASK				0x80	//mascara para el comando SPI especial ChannelConfig
+#define MAX_TX_RX_PAYLOAD		32		//ningun payload puede ser mayor a 32 bytes (dentro de esos 32bytes se
+										//implementa el protocolo que uno desee
+#define CONFIG_REG_LENGTH		10		//longitud en bytes del registro de configuracion
+#define HFREQ_PLL_433			0		//bit para especificar al PLL en que banda trabajar (433[MHz])
+#define HFREQ_PLL_868_915		1		//868[MHz] o 915[MHz]
+#define DEFAULT_CHANNEL			0x006B	//esto se utiliza en la inicializacion, corresponde a 433.1[MHz]
+
+#define XOF_4MHZ				0		//Seteos necesarios para indicar al integrado el cristal que
+#define XOF_8MHZ				1		//utiliza como base para el PLL
+#define XOF_12MHZ				2
+#define XOF_16MHZ				3
+#define XOF_20MHZ				4
+
+#define CLKOUT_4MHZ				0
+#define CLKOUT_2MHZ				1
+#define CLKOUT_1MHZ				2
+#define CLKOUT_500KHZ			3
+
+#define PA_PWR_MINUS_10DBM		0
+#define PA_PWR_MINUS_2DBM		1
+#define PA_PWR_PLUS_6DBM		2
+#define PA_PWR_PLUS_10DBM		3
+
+#define CRC16_MODE				1
+#define CRC8_MODE				0
 
 
 /**
@@ -33,52 +63,65 @@
  * PREDEFINED SYMBOLS. Equivale a --define HW_PLATFORM para compilar en linea de comandos
  */
 
-#ifdef TIVA_C
-
-/**
- * Includes especificos para TivaC
- */
-#include "inc/hw_memmap.h"
-#include "driverlib/gpio.h"
-#include "driverlib/ssi.h"
-#include "driverlib/sysctl.h"
-
-
-/**
- * Definiciones de hardware para pines
- */
-#define TX_EN_BASE				GPIO_PORTB_BASE
-#define TX_EN_GPIO				GPIO_PIN_5
-
-#define TRX_CE_BASE				GPIO_PORTB_BASE
-#define TRX_CE_GPIO				GPIO_PIN_0
-
-#define PWR_UP_BASE				GPIO_PORTB_BASE
-#define PWR_UP_GPIO				GPIO_PIN_1
-
-#define ADDRESS_MATCH_BASE		GPIO_PORTB_BASE
-#define ADDRESS_MATCH_GPIO		GPIO_PIN_2
-
-#define DATA_READY_BASE			GPIO_PORTB_BASE
-#define DATA_READY_GPIO			GPIO_PIN_6
-
-#define CARRIER_DETECT_BASE		GPIO_PORTB_BASE
-#define CARRIER_DETECT_GPIO		GPIO_PIN_7
-
-#define CHIP_ENABLE_BASE		GPIO_PORTA_BASE
-#define CHIP_ENABLE_GPIO		GPIO_PIN_3
-/**
- * Definiciones de hardware para SPI
- */
-
-#define SPI_BASE				SSI0_BASE
-
-#endif
-
 #ifdef MSP430
 #endif
 
 #ifdef EDU_CIAA
+/**
+ * Includes especificos para Edu CIAA
+ */
+#include "chip.h"
+
+#define	TCCH_NRF905			1020
+
+/**
+ * Definiciones de hardware para pines
+ */
+
+//GPIO0 = PWR_UP
+#define PWR_UP_P    		6
+#define PWR_UP_P_   		1
+#define PWR_UP_GPIO 		3
+#define PWR_UP_PIN  		0
+
+//GPIO1 = ADDRESS_MATCH
+#define ADDRESS_MATCH_P    	6
+#define ADDRESS_MATCH_P_   	4
+#define ADDRESS_MATCH_GPIO 	3
+#define ADDRESS_MATCH_PIN  	3
+
+//GPIO2 = DATA_READY
+#define DATA_READY_P    	6
+#define DATA_READY_P_   	5
+#define DATA_READY_GPIO 	3
+#define DATA_READY_PIN  	4
+
+//GPIO3 = CARRIER_DETECT
+#define CARRIER_DETECT_P    6
+#define CARRIER_DETECT_P_  	7
+#define CARRIER_DETECT_GPIO 5
+#define CARRIER_DETECT_PIN 	15
+
+//GPIO4 = CHIP_ENABLE
+#define CHIP_ENABLE_P    	6
+#define CHIP_ENABLE_P_  	8
+#define CHIP_ENABLE_GPIO 	5
+#define CHIP_ENABLE_PIN 	16
+
+//GPIO5 = TX_EN
+#define TX_EN_P    			6
+#define TX_EN_P_  			9
+#define TX_EN_GPIO 			3
+#define TX_EN_PIN 			5
+
+
+//GPIO6 = TRX_CE
+#define TRX_CE_P    		6
+#define TRX_CE_P_  			10
+#define TRX_CE_GPIO 		3
+#define TRX_CE_PIN 			6
+
+
 #endif
 
 
@@ -88,17 +131,23 @@
  */
 
 struct _nRF905 {
-	uint8_t Canal;				//Canal en el que esta trabajando el modulo
+	uint16_t Canal;				//Canal en el que esta trabajando el modulo
 	uint8_t Potencia;			//potencia de transmision
-	uint8_t PLL_Freq;			//Frecuencia de PLL
+	bool PLL_Freq;			//Frecuencia de PLL
 	uint8_t Modo_Operacion;		//Modo de operacion refiere a seccion 8.2 del manual
 	bool Retransmision;			//retransmision true or false
 	bool ClockOut;				//habilitacion de clockout
+	uint8_t ClockOut_Freq;		//Frecuencia de salida del reloj producido por el modulo
+	bool Potencia_Rx;			//habilitacion de reduccion de potencia en recepcion
 	uint8_t ClockModulo;		//frecuencia de cristal utilizado para alimentar el PLL
 	uint32_t DireccionTX;		//direccion a la cual se quiere transmitir
 	uint32_t DireccionRX;		//direccion en la cual se recibiran datos
 	uint8_t LongRX_Payload;		//largo del payload RX
 	uint8_t LongTX_Payload;		//largo del payload TX
+	uint8_t LongRX_Address;		//cantidad de bytes de longitud de la direccion de recepcion
+	uint8_t LongTX_Address;		//cantidad de bytes de longitud de la direccion de transmision
+	bool CRC_Mode;				//Booleano para describir el modo crc (1 => CRC16; 0 => CRC8)
+	bool CRC_Enable;			//Habilitacion del checkeo CRC
 
 	bool CD;					//Flag Carrier Detect para interrupciones
 	bool AM;					//Flag Address Match para interrupciones
@@ -115,15 +164,26 @@ struct _spi_flags  {
 	bool irqRX;
 };
 
+
 typedef struct _nRF905 nRF905;
 typedef struct _spi_flags spi_flags;
 
-extern nRF905 g_nRF905_Config;
+//extern nRF905 g_nRF905_Config;
 
+bool getAddressMatch_FromIRQ(void);
+void setAddressMatch_FromIRQ(bool X);
+bool getDataReady_FromIRQ(void);
+void setDataReady_FromIRQ(bool X);
+bool getCarrierDetect_FromIRQ(void);
+void setCarrierDetect_FromIRQ(bool X);
+
+void nRF905_Init(void);
 void nRF905_setTXFlag(void);
 bool nRF905_setTXAddress(uint32_t Direccion);
+bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes);
+bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes);
+bool nRF905_ChanelConfig(void);
+bool nRF905_WriteConfig(void);
 
-void escribir(void);
-void leer(void);
 
 #endif /* NRF905_H_ */

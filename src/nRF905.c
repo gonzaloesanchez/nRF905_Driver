@@ -38,7 +38,7 @@ static uint8_t g_ui8StatusReg;	//esta variable contiene status despues de cada
 								//transicion bajo-alto de CD
 
 
-nRF905 g_nRF905_Config;			//variable global que contiene toda la configuracion
+static nRF905 g_nRF905_Config;	//variable global que contiene toda la configuracion
 								//del dispositivo.
 								//Todas las funciones de configuracion tendran esta
 								//estructura como argumento
@@ -85,13 +85,6 @@ static bool spi_write(uint8_t Comando)  {
 	bool Ret = false;
 	uint32_t Aux;
 
-#ifdef TIVA_C
-
-	if(SSIDataPutNonBlocking(SPI_BASE,(uint32_t)Comando))	//Ponemos el Comando en el buffer FIFO
-		Ret = true;				//la transaccion fue exitosa
-
-#endif
-
 
 #ifdef MSP430
 	/*
@@ -134,6 +127,19 @@ static bool spi_write(uint8_t Comando)  {
 
 
 #ifdef EDU_CIAA
+
+	Chip_SSP_DATA_SETUP_T xferConfig;
+
+	xferConfig.tx_data = &Comando;
+	xferConfig.tx_cnt  = 0;
+	xferConfig.rx_data = NULL;
+	xferConfig.rx_cnt  = 0;
+	xferConfig.length  = 1;
+
+	Chip_SSP_RWFrames_Blocking( LPC_SSP1, &xferConfig );
+
+	Ret = true;
+
 #endif
 
 	return Ret;
@@ -161,22 +167,67 @@ static bool spi_read(uint8_t *R)  {
 	bool Ret = false;
 	uint32_t Aux;
 
-#ifdef TIVA_C
-
-	if(SSIDataGetNonBlocking(SPI_BASE,&Aux))  {		//Se piden datos desde el FIFO
-		*R = (uint8_t)Aux;							//los se pasan a la variable argumento
-		Ret = true;									//(por referencia) y se devuelve TRUE
-	}
-
-#endif
-
 
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_SSP_DATA_SETUP_T xferConfig;
+
+	xferConfig.tx_data = NULL;
+	xferConfig.tx_cnt  = 0;
+	xferConfig.rx_data = R;
+	xferConfig.rx_cnt  = 0;
+	xferConfig.length  = 1;
+
+	Chip_SSP_RWFrames_Blocking( LPC_SSP1, &xferConfig );
+
+	Ret = true;
+
 #endif
 
 	return Ret;
+}
+
+/*****************************************************************************************
+ * Funcion spi_flush
+ * Sirve para limpiar el FIFO de entrada del HW SPI
+ *****************************************************************************************/
+static void spi_flush(void)  {
+	uint32_t Aux;
+
+#ifdef MSP430
+#endif
+#ifdef EDU_CIAA
+
+	/* Clear all remaining frames in RX FIFO */
+	while (Chip_SSP_GetStatus(LPC_SSP1, SSP_STAT_RNE)) {
+		Chip_SSP_ReceiveFrame(LPC_SSP1);
+	}
+
+#endif
+}
+
+/*****************************************************************************************
+ * Funcion spi_wait
+ * Sirve para esperar eventos de completamiento del SPI (Hasta ahora solo para TIVA)
+ * (no es necesario en MSP430)
+ *****************************************************************************************/
+static void spi_wait(void)  {
+
+#ifdef MSP430
+#endif
+#ifdef EDU_CIAA
+	uint32_t i;
+
+	/*
+	 * Toda la transmision de SPI es bloqueante con las funciones utilizadas, asi que esto
+	 * no afecta. Es para que el CS no se ponga en idle antes de cumplido el Tcch despues
+	 * del ultimo clock. La constante es empirica
+	 */
+	for(i=0;i<TCCH_NRF905;i++);
+
+#endif
 }
 
 /**
@@ -184,19 +235,14 @@ static bool spi_read(uint8_t *R)  {
  */
 static void setTX_Enable(bool Value)  {
 
-#ifdef TIVA_C
-
-	if(Value)
-		GPIOPinWrite(TX_EN_BASE,TX_EN_GPIO,ON);
-	else
-		GPIOPinWrite(TX_EN_BASE,TX_EN_GPIO,OFF);
-
-#endif
 
 
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_GPIO_SetPinState( LPC_GPIO_PORT, TX_EN_GPIO, TX_EN_PIN, Value);
+
 #endif
 }
 
@@ -206,18 +252,13 @@ static void setTX_Enable(bool Value)  {
  *****************************************************************************************/
 static void setTRX_ChipEnable(bool Value)  {
 
-#ifdef TIVA_C
-
-	if(Value)
-		GPIOPinWrite(TRX_CE_BASE,TRX_CE_GPIO,ON);
-	else
-		GPIOPinWrite(TRX_CE_BASE,TRX_CE_GPIO,OFF);
-
-#endif
 
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_GPIO_SetPinState( LPC_GPIO_PORT, TRX_CE_GPIO, TRX_CE_PIN, Value);
+
 #endif
 }
 
@@ -228,17 +269,12 @@ static void setTRX_ChipEnable(bool Value)  {
  *****************************************************************************************/
 static void setPowerUp(bool Value)  {
 
-#ifdef TIVA_C
-
-	if(Value)
-		GPIOPinWrite(PWR_UP_BASE,PWR_UP_GPIO,ON);
-	else
-		GPIOPinWrite(PWR_UP_BASE,PWR_UP_GPIO,OFF);
-
-#endif
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_GPIO_SetPinState( LPC_GPIO_PORT, PWR_UP_GPIO, PWR_UP_PIN, Value);
+
 #endif
 
 }
@@ -249,17 +285,12 @@ static void setPowerUp(bool Value)  {
  *****************************************************************************************/
 static void setChipEnable(bool Value)  {
 
-#ifdef TIVA_C
-
-	if(Value)
-		GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,ON);	//CS -> High (Deshabilitado)
-	else
-		GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,OFF);	//CS -> Low (Habilitacion Negada)
-
-#endif
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_GPIO_SetPinState( LPC_GPIO_PORT, CHIP_ENABLE_GPIO, CHIP_ENABLE_PIN, Value);
+
 #endif
 
 }
@@ -273,19 +304,13 @@ static bool getAddressMatch(void)  {
 	bool Ret;
 	uint32_t Pins;
 
-#ifdef TIVA_C
-
-	Pins = GPIOPinRead(ADDRESS_MATCH_BASE,ADDRESS_MATCH_GPIO);		//leemos el valor del puerto
-	if(ADDRESS_MATCH_GPIO & Pins)					//ese valor viene enmascarado por ADDRESS_MATCH_GPIO
-		Ret = true;									//por lo que si es HIGH el resultado es != 0
-	else
-		Ret = false;								//caso contrario sera 0
-
-#endif
 
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Ret = Chip_GPIO_ReadPortBit( LPC_GPIO_PORT, ADDRESS_MATCH_GPIO, ADDRESS_MATCH_PIN );
+
 #endif
 
 	return Ret;
@@ -299,19 +324,13 @@ static bool getDataReady(void)  {
 	bool Ret;
 	uint32_t Pins;
 
-#ifdef TIVA_C
-
-	Pins = GPIOPinRead(DATA_READY_BASE,DATA_READY_GPIO);		//leemos el valor del puerto
-	if(DATA_READY_GPIO & Pins)					//ese valor viene enmascarado por DATA_READY_GPIO
-		Ret = true;									//por lo que si es HIGH el resultado es != 0
-	else
-		Ret = false;								//caso contrario sera 0
-
-#endif
 
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Ret = Chip_GPIO_ReadPortBit( LPC_GPIO_PORT, DATA_READY_GPIO, DATA_READY_PIN );
+
 #endif
 
 	return Ret;
@@ -322,110 +341,94 @@ static bool getDataReady(void)  {
  * Funcion getCarrierDetect
  *****************************************************************************************/
 static bool getCarrierDetect(void)  {
-	bool Ret;
+	bool Ret = false;
 	uint32_t Pins;
 
-#ifdef TIVA_C
-
-	Pins = GPIOPinRead(CARRIER_DETECT_BASE,CARRIER_DETECT_GPIO);		//leemos el valor del puerto
-	if(CARRIER_DETECT_GPIO & Pins)					//ese valor viene enmascarado por CARRIER_DETECT_GPIO
-		Ret = true;									//por lo que si es HIGH el resultado es != 0
-	else
-		Ret = false;								//caso contrario sera 0
-
-#endif
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Ret = Chip_GPIO_ReadPortBit( LPC_GPIO_PORT, CARRIER_DETECT_GPIO, CARRIER_DETECT_PIN );
+
 #endif
 
 	return Ret;
 }
 
 
+
+/*----------------------------------------------------------------------------------------
+
+		LA PROXIMA SECCION CONTIENE LAS FUNCIONES ACCESIBLES POR MODULOS EXTERNOS
+
+----------------------------------------------------------------------------------------*/
+
+
 /*****************************************************************************************
  * Funcion getAddressMatch_FromIRQ
  *****************************************************************************************/
-static bool getAddressMatch_FromIRQ(void)  {
-	bool Ret = false;
+bool getAddressMatch_FromIRQ(void)  {
 
-	if(g_nRF905_Config.AM)
-		Ret = true;
+	return g_nRF905_Config.AM;
 
 	//TODO: Si es necesario, codificar aqui para HW limitado
 
-	return Ret;
+}
+
+/*****************************************************************************************
+ * Funcion setAddressMatch_FromIRQ
+ *****************************************************************************************/
+void setAddressMatch_FromIRQ(bool X)  {
+
+	g_nRF905_Config.AM = X;
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
 }
 
 
 /*****************************************************************************************
  * Funcion getDataReady_FromIRQ
  *****************************************************************************************/
-static bool getDataReady_FromIRQ(void)  {
-	bool Ret = false;
-
-	if(g_nRF905_Config.DR)
-		Ret = true;
-
+bool getDataReady_FromIRQ(void)  {
 	//TODO: Si es necesario, codificar aqui para HW limitado
 
-	return Ret;
+	return g_nRF905_Config.DR;
+}
+
+/*****************************************************************************************
+ * Funcion getDataReady_FromIRQ
+ *****************************************************************************************/
+void setDataReady_FromIRQ(bool X)  {
+
+	g_nRF905_Config.DR = X;
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
 }
 
 
 /*****************************************************************************************
  * Funcion getCarrierDetect_FromIRQ
  *****************************************************************************************/
-static bool getCarrierDetect_FromIRQ(void)  {
-	bool Ret = false;
-
-	if(g_nRF905_Config.CD)
-		Ret = true;
+bool getCarrierDetect_FromIRQ(void)  {
 
 	//TODO: Si es necesario, codificar aqui para HW limitado
 
-	return Ret;
-}
-
-
-/*****************************************************************************************
- * Funcion spi_flush
- * Sirve para limpiar el FIFO de entrada del HW SPI
- *****************************************************************************************/
-static void spi_flush(void)  {
-	uint32_t Aux;
-#ifdef TIVA_C
-
-	while(SSIDataGetNonBlocking(SPI_BASE,&Aux));	//cuando devuelva 0 el FIFO esta vacio
-
-#endif
-#ifdef MSP430
-#endif
-#ifdef EDU_CIAA
-#endif
+	return g_nRF905_Config.CD;
 }
 
 /*****************************************************************************************
- * Funcion spi_wait
- * Sirve para esperar eventos de completamiento del SPI (Hasta ahora solo para TIVA)
- * (no es necesario en MSP430)
+ * Funcion getCarrierDetect_FromIRQ
  *****************************************************************************************/
-static void spi_wait(void)  {
-#ifdef TIVA_C
+void setCarrierDetect_FromIRQ(bool X)  {
 
-	SysCtlDelay(1e3);		//a 50[MHz] esto es 1[ms]
+	//TODO: Si es necesario, codificar aqui para HW limitado
 
-#endif
-#ifdef MSP430
-#endif
-#ifdef EDU_CIAA
-#endif
+	g_nRF905_Config.CD = X;
+
 }
-/*----------------------------------------------------------------------------------------
 
-		LA PROXIMA SECCION CONTIENE LAS FUNCIONES ACCESIBLES POR MODULOS EXTERNOS
 
-----------------------------------------------------------------------------------------*/
 
 /*
  * Esta funcion devuelve el valor de la variable interna al modulo. Asi la hacemos
@@ -454,26 +457,30 @@ void nRF905_Init(void)  {
 
 	//TODO: Modificar valores!! Definir constantes para cada caso.
 	//Estos valores no son correctos
-	g_nRF905_Config.Canal = 0;
-	g_nRF905_Config.ClockModulo = 0;
+	g_nRF905_Config.Canal = DEFAULT_CHANNEL;
+	g_nRF905_Config.ClockModulo = XOF_16MHZ;
 	g_nRF905_Config.ClockOut = false;
+	g_nRF905_Config.ClockOut_Freq = CLKOUT_500KHZ;		//este valor es ignorado al estar deshabilitada esta funcion
 	g_nRF905_Config.DireccionRX = 0xFFFFFFFF;
 	g_nRF905_Config.DireccionTX = 0xFFFFFFFF;
-	g_nRF905_Config.LongRX_Payload = 0;
-	g_nRF905_Config.LongTX_Payload = 0;
-	g_nRF905_Config.PLL_Freq = 0;
-	g_nRF905_Config.Potencia = 0;
+	g_nRF905_Config.LongRX_Payload = MAX_TX_RX_PAYLOAD;
+	g_nRF905_Config.LongTX_Payload = MAX_TX_RX_PAYLOAD;
+	g_nRF905_Config.PLL_Freq = HFREQ_PLL_433;
+	g_nRF905_Config.Potencia = PA_PWR_PLUS_10DBM;
 	g_nRF905_Config.Retransmision = false;
+	g_nRF905_Config.Potencia_Rx = false;
+	g_nRF905_Config.LongRX_Address = 4;
+	g_nRF905_Config.LongTX_Address = 4;
+	g_nRF905_Config.CRC_Enable = true;
+	g_nRF905_Config.CRC_Mode = CRC16_MODE;
 
 
-#ifdef TIVA_C
-
-	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,ON);	//CS -> High (Deshabilitamos)
-
-#endif
 #ifdef MSP430
 #endif
 #ifdef EDU_CIAA
+
+	Chip_GPIO_SetPinState( LPC_GPIO_PORT, CHIP_ENABLE_GPIO, CHIP_ENABLE_PIN, true); //CS -> High (Deshabilitamos)
+
 #endif
 
 }
@@ -494,11 +501,19 @@ void nRF905_setTXFlag(void)  {
 	g_spi_Control.irqTX = true;
 }
 
+
+/**
+ * @brief Esta funcion envia el comando correspondiente a setear la direccion a la cual se transmite.
+ *
+ * @param Direccion es un valor de 32bits donde seran enviados los datos via RF
+ * @return La funcion devuelve @p TRUE si el envio fue exitoso o @p FALSE en caso contrario
+ * @warning Las causas de falla normalmente son que no haya lugar en el FIFO.
+ */
 bool nRF905_setTXAddress(uint32_t Direccion)  {
 	bool Ret = false;
 
 	setChipEnable(false);		//Bajamos chip select
-	if(!spi_write(C_WRITE_TX_ADD))  {	//comando para escribir registros de direccion de TX
+	if(!spi_write(C_WRITE_TX_ADDRR))  {	//comando para escribir registros de direccion de TX
 		setChipEnable(true);			//excepcion
 		return Ret;
 	}
@@ -527,6 +542,130 @@ bool nRF905_setTXAddress(uint32_t Direccion)  {
 	return Ret;
 }
 
+bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes)  {
+	bool Ret = false;
+	uint8_t i;
+
+	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+		setChipEnable(false);		//Bajamos chip select
+		if(!spi_write(C_WRITE_TX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
+
+		for (i=0;i<cant_bytes;i++) {
+			if(!spi_write(data_tx[i]))  {	//comando para escribir registros de direccion de TX
+				setChipEnable(true);		//excepcion
+				return Ret;
+			}
+		}
+
+		spi_wait();								//espera para sincronizar ultimo clock y CS high
+		spi_flush();							//No nos interesa nada de lo que haya entrado
+
+		setChipEnable(true);					//termino la transaccion
+		Ret = true;
+	}
+
+
+	return Ret;
+}
+
+bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
+	bool Ret = false;
+	uint8_t i;
+
+	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+		setChipEnable(false);		//Bajamos chip select
+		if(!spi_write(C_READ_RX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
+
+		for (i=0;i<cant_bytes;i++) {
+			if(!spi_write(data_rx[i]))  {	//comando para escribir registros de direccion de TX
+				setChipEnable(true);		//excepcion
+				return Ret;
+			}
+		}
+
+		spi_wait();								//espera para sincronizar ultimo clock y CS high
+		spi_flush();							//No nos interesa nada de lo que haya entrado
+
+		setChipEnable(true);					//termino la transaccion
+		Ret = true;
+	}
+
+	return Ret;
+}
+
+
+bool nRF905_ChanelConfig(void)  {
+	bool Ret = false;
+	uint8_t cc_MSB,cc_LSB;
+
+
+	cc_MSB = CONFIG_MASK | (g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
+				((g_nRF905_Config.Canal & 0x100000000) >> 8);
+	cc_LSB = g_nRF905_Config.Canal & 0xFF;
+
+	setChipEnable(false);		//Bajamos chip select
+	if(!spi_write(cc_MSB))  {	//comando para configurar el canal (el comando esta incluido en CONFIG_MASK)
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+	if(!spi_write(cc_LSB))  {	//parte baja del comando config channel
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+
+	spi_wait();								//espera para sincronizar ultimo clock y CS high
+	spi_flush();							//No nos interesa nada de lo que haya entrado
+
+	setChipEnable(true);					//termino la transaccion
+	Ret = true;
+
+	return Ret;
+}
+
+bool nRF905_WriteConfig(void)  {
+	bool Ret = false;
+	uint8_t config_reg[CONFIG_REG_LENGTH];
+	uint8_t i;
+
+	config_reg[0] = g_nRF905_Config.Canal & 0xFF;
+	config_reg[1] = (g_nRF905_Config.Retransmision << 5) | (g_nRF905_Config.Potencia_Rx << 4) |
+					(g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
+					((g_nRF905_Config.Canal & 0x100000000) >> 8);
+	config_reg[2] = (g_nRF905_Config.LongTX_Address << 4) | g_nRF905_Config.LongRX_Address;
+	config_reg[3] = g_nRF905_Config.LongRX_Payload;
+	config_reg[4] = g_nRF905_Config.LongTX_Payload;
+
+	config_reg[5] = g_nRF905_Config.DireccionRX & 0xFF;
+	config_reg[6] = (g_nRF905_Config.DireccionRX >> 8) & 0xFF;
+	config_reg[7] = (g_nRF905_Config.DireccionRX >> 16) & 0xFF;
+	config_reg[8] = (g_nRF905_Config.DireccionRX >> 24) & 0xFF;
+	config_reg[9] = (g_nRF905_Config.CRC_Mode << 7) | (g_nRF905_Config.CRC_Enable << 6) |
+					(g_nRF905_Config.ClockModulo << 3) | (g_nRF905_Config.ClockOut << 2)|
+					g_nRF905_Config.ClockOut_Freq;
+
+
+	setChipEnable(false);		//Bajamos chip select
+	for(i=0;i<CONFIG_REG_LENGTH;i++)  {
+		if(!spi_write(config_reg[i]))  {	//comando para escribir en el registro de configuracion
+			setChipEnable(true);		//excepcion
+			return Ret;
+		}
+	}
+
+	spi_wait();								//espera para sincronizar ultimo clock y CS high
+	spi_flush();							//No nos interesa nada de lo que haya entrado
+
+	setChipEnable(true);					//termino la transaccion
+	Ret = true;
+
+	return Ret;
+}
 
 
 
