@@ -16,7 +16,7 @@
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
  */
-#define EDU_CIAA
+//#define EDU_CIAA
 
 /**
  * @brief Definiciones generales para el proyecto.
@@ -64,6 +64,49 @@
  */
 
 #ifdef MSP430
+
+#include <msp430.h>
+
+//algunas macros para facilitar la lectura de las operaciones de bits
+#define SetBit(Dir, Bit) Dir |= (Bit)
+#define RstBit(Dir, Bit) Dir &= ~(Bit)
+#define ToggleBit(Dir, Bit) Dir ^= (Bit)
+
+//P1.4 = CHIP_ENABLE_NRF
+#define CHIP_ENABLE_NRF			BIT4
+#define CHIP_ENABLE_NRF_DIR	P1DIR
+#define CHIP_ENABLE_NRF_OUT	P1OUT
+
+//P2.0 = PWR_UP
+#define PWR_UP					BIT0
+#define PWR_UP_DIR			P2DIR
+#define PWR_UP_OUT			P2OUT
+
+//P2.1 = TRX_CE
+#define TRX_CE					BIT1
+#define TRX_CE_DIR			P2DIR
+#define TRX_CE_OUT			P2OUT
+
+//P2.2 = TX_EN
+#define TX_EN					BIT2
+#define TX_EN_DIR				P2DIR
+#define TX_EN_OUT				P2OUT
+
+//P2.3 = DATA_READY
+#define DATA_READY				BIT3
+#define DATA_READY_DIR			P2DIR
+#define DATA_READY_IN			P2IN
+
+//P2.4 = ADDRESS_MATCH
+#define ADDRESS_MATCH				BIT4
+#define ADDRESS_MATCH_DIR			P2DIR
+#define ADDRESS_MATCH_IN			P2IN
+
+//P2.5 = CARRIER_DETECT
+#define CARRIER_DETECT				BIT5
+#define CARRIER_DETECT_DIR			P2DIR
+#define CARRIER_DETECT_IN			P2IN
+
 #endif
 
 #ifdef EDU_CIAA
@@ -159,14 +202,8 @@ struct _nRF905 {
 						//estos FLAGS
 };
 
-struct _spi_flags  {
-	bool irqTX;
-	bool irqRX;
-};
-
 
 typedef struct _nRF905 nRF905;
-typedef struct _spi_flags spi_flags;
 
 //extern nRF905 g_nRF905_Config;
 
@@ -176,6 +213,7 @@ bool getDataReady_FromIRQ(void);
 void setDataReady_FromIRQ(bool X);
 bool getCarrierDetect_FromIRQ(void);
 void setCarrierDetect_FromIRQ(bool X);
+void setSPI_IRQFlag(void);
 
 void nRF905_Init(void);
 void nRF905_setTXFlag(void);

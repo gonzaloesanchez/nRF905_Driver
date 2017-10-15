@@ -43,7 +43,7 @@ static nRF905 g_nRF905_Config;	//variable global que contiene toda la configurac
 								//Todas las funciones de configuracion tendran esta
 								//estructura como argumento
 
-static spi_flags g_spi_Control;		//esta es una variable global que debe ser modificada
+static bool g_spi_IRQFlag;		//esta es una variable global que debe ser seteada
 									//por las interrupciones para las funciones base
 									//de esta libreria. La modificacion solo se hara
 									//mediante funciones set desde las interrupciones
@@ -83,46 +83,19 @@ static spi_flags g_spi_Control;		//esta es una variable global que debe ser modi
  */
 static bool spi_write(uint8_t Comando)  {
 	bool Ret = false;
-	uint32_t Aux;
+	uint8_t Aux;
 
 
 #ifdef MSP430
-	/*
-	 * 	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,OFF);	//CS -> Low (Habilitacion Negada)
-	if(!SSIDataPutNonBlocking(SPI_BASE,(uint32_t)Comando))	//Ponemos el Comando en el buffer FIFO
-		return Ret;										//Si esta funcion devuelve != 0 el
-														//envio se iniciara en breves instantes
-														//caso contrario debemos salir, es una excepcion
 
-	while (!g_spi_Control.irqTX)  {			//esperamos un evento
-		SysCtlDeepSleep();					//esta funcion tiene un WFI dentro
+	UCB0TXBUF = Comando;					//Comienza la transmision
+	while (!g_spi_IRQFlag)  {			//esperamos un evento
+			LPM3;								//entramos en LowPowerMode. Es una macro esto
 	}
-	g_spi_Control.irqTX = false;			//limpiamos el flag
+	g_spi_IRQFlag = false;
 
-	//Ponemos la parte baja del Dato en el buffer FIFO. Si falla debemos salir, excepcion de
-	//envio
-	if(!SSIDataPutNonBlocking(SPI_BASE,(uint32_t) (0x00FF & Dato)))
-		return Ret;
+	Ret = true;
 
-	while (!g_spi_Control.irqTX)  {			//esperamos un evento
-		SysCtlDeepSleep();					//esta funcion tiene un WFI dentro
-	}
-	g_spi_Control.irqTX = false;			//limpiamos el flag
-
-	//Ponemos la parte alta del Dato en el buffer FIFO. Si falla debemos salir, excepcion de
-	//envio
-	if(!SSIDataPutNonBlocking(SPI_BASE,(uint32_t) (Dato >> 8)))
-		return Ret;
-
-	//Debemos sacar el byte correspondiente a STATUS_REG. Si falla es una excepcion
-	if (!SSIDataGetNonBlocking(SPI_BASE,&Aux))
-		return Ret;
-	g_ui8StatusReg = (uint8_t)Aux;			//actualizacion de status reg
-
-	while(SSIDataGetNonBlocking(SPI_BASE,&Aux));	//sacamos toda la basura del FIFO
-
-	Ret = true;				//si llegamos hasta aqui, la transaccion fue exitosa
-	GPIOPinWrite(CHIP_ENABLE_BASE,CHIP_ENABLE_GPIO,ON);	//CS -> High (Habilitacion Negada)*/
 #endif
 
 
@@ -169,6 +142,13 @@ static bool spi_read(uint8_t *R)  {
 
 
 #ifdef MSP430
+	/*
+	 * No me sirve de mucho en esta arquitectura porque solamente tiene un byte de buffer
+	 * de todas maneras no lo uso para nada al read (no se implemento ninguna funcion de
+	 * lectura)
+	 * */
+	Ret = true;
+
 #endif
 #ifdef EDU_CIAA
 
@@ -194,9 +174,10 @@ static bool spi_read(uint8_t *R)  {
  * Sirve para limpiar el FIFO de entrada del HW SPI
  *****************************************************************************************/
 static void spi_flush(void)  {
-	uint32_t Aux;
+	uint8_t Aux;
 
 #ifdef MSP430
+	Aux = UCB0RXBUF;	//esto provoca que la bandera RXIF se limpie por HW
 #endif
 #ifdef EDU_CIAA
 
@@ -216,6 +197,7 @@ static void spi_flush(void)  {
 static void spi_wait(void)  {
 
 #ifdef MSP430
+	//no hace falta, la interrupcion maneja esto
 #endif
 #ifdef EDU_CIAA
 	uint32_t i;
@@ -235,9 +217,13 @@ static void spi_wait(void)  {
  */
 static void setTX_Enable(bool Value)  {
 
-
-
 #ifdef MSP430
+
+	if (Value)
+		SetBit(TX_EN_OUT,TX_EN);
+	else
+		RstBit(TX_EN_OUT,TX_EN);
+
 #endif
 #ifdef EDU_CIAA
 
@@ -254,6 +240,12 @@ static void setTRX_ChipEnable(bool Value)  {
 
 
 #ifdef MSP430
+
+	if (Value)
+		SetBit(TRX_CE_OUT,TRX_CE);
+	else
+		RstBit(TRX_CE_OUT,TRX_CE);
+
 #endif
 #ifdef EDU_CIAA
 
@@ -270,6 +262,12 @@ static void setTRX_ChipEnable(bool Value)  {
 static void setPowerUp(bool Value)  {
 
 #ifdef MSP430
+
+	if (Value)
+		SetBit(PWR_UP_OUT,PWR_UP);
+	else
+		RstBit(PWR_UP_OUT,PWR_UP);
+
 #endif
 #ifdef EDU_CIAA
 
@@ -286,6 +284,12 @@ static void setPowerUp(bool Value)  {
 static void setChipEnable(bool Value)  {
 
 #ifdef MSP430
+
+	if (Value)
+		SetBit(CHIP_ENABLE_NRF_OUT,CHIP_ENABLE_NRF);
+	else
+		RstBit(CHIP_ENABLE_NRF_OUT,CHIP_ENABLE_NRF);
+
 #endif
 #ifdef EDU_CIAA
 
@@ -302,10 +306,17 @@ static void setChipEnable(bool Value)  {
  *****************************************************************************************/
 static bool getAddressMatch(void)  {
 	bool Ret;
-	uint32_t Pins;
+	uint8_t Pins;
 
 
 #ifdef MSP430
+
+	Pins = ADDRESS_MATCH_IN;
+	if((Pins & ADDRESS_MATCH) != 0)
+		Ret = true;
+	else
+		Ret = false;
+
 #endif
 #ifdef EDU_CIAA
 
@@ -322,10 +333,17 @@ static bool getAddressMatch(void)  {
  *****************************************************************************************/
 static bool getDataReady(void)  {
 	bool Ret;
-	uint32_t Pins;
+	uint8_t Pins;
 
 
 #ifdef MSP430
+
+	Pins = DATA_READY_IN;
+	if((Pins & DATA_READY) != 0)
+		Ret = true;
+	else
+		Ret = false;
+
 #endif
 #ifdef EDU_CIAA
 
@@ -342,9 +360,16 @@ static bool getDataReady(void)  {
  *****************************************************************************************/
 static bool getCarrierDetect(void)  {
 	bool Ret = false;
-	uint32_t Pins;
+	uint8_t Pins;
 
 #ifdef MSP430
+
+	Pins = CARRIER_DETECT_IN;
+	if((Pins & CARRIER_DETECT) != 0)
+		Ret = true;
+	else
+		Ret = false;
+
 #endif
 #ifdef EDU_CIAA
 
@@ -418,13 +443,24 @@ bool getCarrierDetect_FromIRQ(void)  {
 }
 
 /*****************************************************************************************
- * Funcion getCarrierDetect_FromIRQ
+ * Funcion setCarrierDetect_FromIRQ
  *****************************************************************************************/
 void setCarrierDetect_FromIRQ(bool X)  {
 
 	//TODO: Si es necesario, codificar aqui para HW limitado
 
 	g_nRF905_Config.CD = X;
+
+}
+
+/*****************************************************************************************
+ * Funcion setSPI_IRQFlag
+ *****************************************************************************************/
+void setSPI_IRQFlag(void)  {
+
+	//TODO: Si es necesario, codificar aqui para HW limitado
+
+	g_spi_IRQFlag = true;
 
 }
 
@@ -440,7 +476,7 @@ bool nRF905_getStatusReg(uint8_t *status)  {
 
 	//se hace una lectura SPI. Si hay algo en el FIFO esta funcion devuelve true
 	//asi que cargamos el valor a la variable pasada por referencia
-	if (spi_receive(&Aux))  {
+	if (spi_read(&Aux))  {
 		*status = Aux;
 		Ret = true;
 	}
@@ -476,6 +512,9 @@ void nRF905_Init(void)  {
 
 
 #ifdef MSP430
+
+	SetBit(CHIP_ENABLE_NRF_OUT,CHIP_ENABLE_NRF);		//CS -> High (Deshabilitamos)
+
 #endif
 #ifdef EDU_CIAA
 
@@ -484,23 +523,6 @@ void nRF905_Init(void)  {
 #endif
 
 }
-
-/**
- * Funcion para setear la bandera de interrupcion de RX. La encapsulo para no tener
- * variables globales definidas en este modulo dando vueltas en el proyecto
- */
-void nRF905_setRXFlag(void)  {
-	g_spi_Control.irqRX = true;
-}
-
-/**
- * Funcion para setear la bandera de interrupcion de TX. La encapsulo para no tener
- * variables globales definidas en este modulo dando vueltas en el proyecto
- */
-void nRF905_setTXFlag(void)  {
-	g_spi_Control.irqTX = true;
-}
-
 
 /**
  * @brief Esta funcion envia el comando correspondiente a setear la direccion a la cual se transmite.
