@@ -1,6 +1,6 @@
 #include <msp430.h>
-#include "inc/nRF905.h"
-#include "inc/Inicializacion.h"
+#include "nRF905.h"
+#include "Inicializacion.h"
 
 /*
  * main.c
@@ -14,12 +14,24 @@ __interrupt void USCI0RX_ISR(void)  {
 
 	Aux = IFG2;
 	if ((Aux & UCB0RXIFG) != 0)  {
+		Aux = UCB0RXBUF;				//solamente para limpiar la bandera de interrupcion
 		setSPI_IRQFlag();				//Ocurrio la interrupcion de finalizacion de operacion
-	}										//seteamos la bandera correspondiente
+											//seteamos la bandera correspondiente
+		 __low_power_mode_off_on_exit();
+	}
 }
 
 
 int main(void) {
+	uint8_t aux[32];
+	uint8_t i;
+
+	aux[0] = 8;
+	for(i=1;i<8;i++)  {
+		aux[i] = i*2;
+	}
+
+
 	ConfigWDT();			// Detengo el WachDog
 	ConfigClocks();		// Configuro el Clock a 16MHz
 	ConfigPorts();			//Configura los puertos

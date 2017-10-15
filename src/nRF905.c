@@ -28,7 +28,7 @@
 
 
 
-#include "inc/nRF905.h"
+#include "nRF905.h"
 
 /**
  * @brief Definiciones globales de este modulo, no visibles hacia afuera
@@ -90,7 +90,7 @@ static bool spi_write(uint8_t Comando)  {
 
 	UCB0TXBUF = Comando;					//Comienza la transmision
 	while (!g_spi_IRQFlag)  {			//esperamos un evento
-			LPM4;								//entramos en LowPowerMode. Es una macro esto
+			LPM3;								//entramos en LowPowerMode. Es una macro esto
 	}
 	g_spi_IRQFlag = false;
 
@@ -476,7 +476,7 @@ bool nRF905_getStatusReg(uint8_t *status)  {
 
 	//se hace una lectura SPI. Si hay algo en el FIFO esta funcion devuelve true
 	//asi que cargamos el valor a la variable pasada por referencia
-	if (spi_receive(&Aux))  {
+	if (spi_read(&Aux))  {
 		*status = Aux;
 		Ret = true;
 	}

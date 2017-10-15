@@ -65,6 +65,8 @@
 
 #ifdef MSP430
 
+#include <msp430.h>
+
 //algunas macros para facilitar la lectura de las operaciones de bits
 #define SetBit(Dir, Bit) Dir |= (Bit)
 #define RstBit(Dir, Bit) Dir &= ~(Bit)
@@ -211,6 +213,7 @@ bool getDataReady_FromIRQ(void);
 void setDataReady_FromIRQ(bool X);
 bool getCarrierDetect_FromIRQ(void);
 void setCarrierDetect_FromIRQ(bool X);
+void setSPI_IRQFlag(void);
 
 void nRF905_Init(void);
 void nRF905_setTXFlag(void);

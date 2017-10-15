@@ -6,9 +6,8 @@
  */
 
 #include <msp430.h>
-#include "inc/Inicializacion.h"
-//#include "HardDefs.h"
-#include "inc/nRF905.h"
+#include "Inicializacion.h"
+#include "nRF905.h"
 
 
 
