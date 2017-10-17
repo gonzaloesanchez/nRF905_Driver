@@ -173,6 +173,12 @@
  * Las definiciones de CD, AM, y DR son para soportar la utilizacion de interrupciones
  */
 
+enum _eComm {eCommFail=-1,eCommNAck=0,eCommAck=1};
+enum _eTipo {eTypeACK=0,eTypePeso=0x0D/*TODO: Completar tipos de datos */};
+
+typedef enum _eComm eComm_t;
+typedef enum _eTipo eTipo_t;
+
 struct _nRF905 {
 	uint16_t Canal;				//Canal en el que esta trabajando el modulo
 	uint8_t Potencia;			//potencia de transmision
@@ -202,8 +208,15 @@ struct _nRF905 {
 						//estos FLAGS
 };
 
+struct _sPacket  {
+	uint8_t sizeofPacket;
+	eTipo_t Tipo;
+	uint8_t Payload[MAX_TX_RX_PAYLOAD-2];
+};
 
 typedef struct _nRF905 nRF905;
+typedef struct _sPacket sPacket_t;
+
 
 //extern nRF905 g_nRF905_Config;
 

@@ -688,6 +688,50 @@ bool nRF905_WriteConfig(void)  {
 
 	return Ret;
 }
+//*********************************************************************************************
+
+
+
+/*=============================================================================================
+ * 				FUNCIONES BASICAS PARA TRANSMISION Y RECEPCION DE DATOS VIA RF
+ =============================================================================================*/
+/**
+ * Esta funcion es bloqueante, queda en espera hasta que se libere el medio
+ */
+void nRF905_CheckMedio(void)  {
+
+}
+
+
+/**
+ * Esta funcion envia datos via RF segun el paquete que hayamos conformado antes
+ *
+ * @param Retrans Indica si hay que intentar retransmitir los datos. Si no se pide
+ * 				  retransmision, la funcion devuelve eCommNAck (no tiene significado)
+ */
+eComm_t nRF905_RF_TxData(sPacket_t *Paquete, bool Retrans)  {
+
+}
+
+/**
+ * Esta funcion recibe datos via RF segun el paquete que hayamos conformado antes
+ *
+ * @param *Paquete es en realidad un paquete de recepcion del cual ya se conoce el tipo
+ * 			solamente se carga el payload, pero asi podemos tener trazabilidad del tipo
+ * 			de datos que se esta recibiendo
+ */
+eComm_t nRF905_RF_RxData(sPacket_t *Paquete)  {
+
+}
+
+
+
+
+
+
+
+
+
 
 
 
