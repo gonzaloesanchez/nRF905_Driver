@@ -16,7 +16,7 @@
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
  */
-#define EDU_CIAA
+//#define EDU_CIAA
 #define COORD
 
 /**
@@ -55,7 +55,11 @@
 #define PA_PWR_PLUS_10DBM		3
 
 #define CRC16_MODE				1
-#define CRC8_MODE				0
+#define CRC8_MODE					0
+
+#define NO_TX_ADDRR				0xFFFFFFFF
+#define NO_RX_ADDRR				0xFFFFFFFF
+#define DEV1_RX_ADDRR			0xA7854C91
 
 
 /**

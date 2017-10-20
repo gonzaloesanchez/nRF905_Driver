@@ -733,8 +733,8 @@ void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool 
 	setTRX_ChipEnable(true);
 
 	if(!keep_radio_on)  {
-		//esperar 1ms
-		g_nRF905_Config.Delay_ms(1);
+		//esperar 2ms (son aproximados, puede ser 1.1 a 2 ms)
+		g_nRF905_Config.Delay_ms(2);
 
 		//TRX_CE = 0 (Radio apagada)
 		setTRX_ChipEnable(false);
@@ -759,7 +759,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	uint8_t timeout;
 
 	// Salimos de PWR_DOWN
-	setTRX_ChipEnable(false);
+	//setTRX_ChipEnable(false);
 	setPowerUp(true);
 
 	//TX_EN = 0 --> recepcion

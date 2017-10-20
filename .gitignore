@@ -10,3 +10,5 @@ targetConfigs/
 target_config.ccxml
 
 src/main\.c
+
+inc/Inicializacion\.h
