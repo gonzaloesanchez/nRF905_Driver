@@ -7,6 +7,8 @@
 
 //TODO: ordenar esto, es un quilombo
 
+
+/*
 static uint16_t g_Ticks_ms;		//esta variable es de apoyo para calcular los tiempos
 								//de espera requeridos por distintas funciones del protocolo
 								//a implementar
@@ -44,7 +46,7 @@ static void espera_aleatoria(void)  {
 }
 
 
-
+*/
 
 /**
  * Esta funcion es "bloqueante", queda en espera hasta que se libere el medio
@@ -56,17 +58,19 @@ static void espera_aleatoria(void)  {
  *
  * @note Tiempo en el aire de un paquete completo desde la activacion de Tx es ~6.93[ms]
  */
+/*
 void nRF905_CheckMedio(void)  {
 
 	while (getCarrierDetect())
 		espera_aleatoria();
 }
-
+*/
 /**
  * Esta funcion debe ser llamada desde la interrupcion de SysTick (o timer) con periodo 1[ms]
  * si accion = true -> incrementamos el contador. si accion = false -> el contador se pone a cero
  * Devuelve el valor de la variable Ticks
  */
+/*
 void nRF905_TickIncrease(void)  {
 	g_Ticks_ms++;
 }
@@ -78,12 +82,13 @@ void nRF905_TickClear(void)  {
 uint16_t nRF905_TickGet(void)  {
 	return g_Ticks_ms;
 }
-
+*/
 
 /*****************************************************************************************
  * Funcion wait_for_interrupt es en realidad un encapsulamiento de una instruccion WFI
  * o de LPM
  *****************************************************************************************/
+/*
 static void wait_for_interrupt(void)  {
 
 
@@ -101,7 +106,7 @@ static void wait_for_interrupt(void)  {
 
 
 
-
+*/
 
 /*=============================================================================================
  * 				FUNCIONES BASICAS PARA TRANSMISION Y RECEPCION DE DATOS VIA RF
@@ -111,7 +116,7 @@ static void wait_for_interrupt(void)  {
  * 	estan por sobre la HAL, pero a su vez, tanto las funciones HAL utilizadas, como las de
  * 	protocolo implementadas, son accesibles por el programador.
  =============================================================================================*/
-
+/*
 static void espera_aleatoria(void)  {
 	static uint8_t contador = 0;
 	uint16_t ticks_inicial;
@@ -126,12 +131,13 @@ static void espera_aleatoria(void)  {
 
 }
 
-
+*/
 /**
  * Esta funcion debe ser llamada desde la interrupcion de SysTick (o timer) con periodo 1[ms]
  * si accion = true -> incrementamos el contador. si accion = false -> el contador se pone a cero
  * Devuelve el valor de la variable Ticks
  */
+/*
 void nRF905_TickIncrease(void)  {
 	g_Ticks_ms++;
 }
@@ -143,7 +149,7 @@ void nRF905_TickClear(void)  {
 uint16_t nRF905_TickGet(void)  {
 	return g_Ticks_ms;
 }
-
+*/
 /**
  * Esta funcion es "bloqueante", queda en espera hasta que se libere el medio
  * La implementacion es la siguiente: se hace un polling del pin CarrierDetect
@@ -154,39 +160,13 @@ uint16_t nRF905_TickGet(void)  {
  *
  * @note Tiempo en el aire de un paquete completo desde la activacion de Tx es ~6.93[ms]
  */
+/*
 void nRF905_CheckMedio(void)  {
 
 	while (getCarrierDetect())
 		espera_aleatoria();
 }
+*/
 
 
-/**
- * Esta funcion envia datos via RF segun el paquete que hayamos conformado antes
- *
- * @param Retrans Indica si hay que intentar retransmitir los datos. Si no se pide
- * 				  retransmision, la funcion devuelve eCommNAck (no tiene significado)
- */
-void nRF905_RF_TxData(sPacket_t *Paquete)  {
-
-	/* salir de POWER_DOWN mode
-	 * esperar 3ms a STND_BY (PWR_DOWN = 1, TX_EN = 1)
-	* Cargar payload y TX address
-	* TRX_CE = 1
-	* esperar 1ms
-	* TRX_CE = 1
-	* esperar tpreamble + (total Bites / 50kbps) ==> 200us + (32(address) + 32*8(payload) + 16(CRC)) / 50e3
-	* --> esperar 6.28ms (redondeamos a 7)  */
-}
-
-/**
- * Esta funcion recibe datos via RF segun el paquete que hayamos conformado antes
- *
- * @param *Paquete es en realidad un paquete de recepcion del cual ya se conoce el tipo
- * 			solamente se carga el payload, pero asi podemos tener trazabilidad del tipo
- * 			de datos que se esta recibiendo
- */
-eComm_t nRF905_RF_RxData(sPacket_t *Paquete)  {
-
-}
 

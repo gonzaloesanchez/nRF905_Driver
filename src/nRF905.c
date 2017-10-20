@@ -493,18 +493,11 @@ bool nRF905_getStatusReg(uint8_t *status)  {
 void nRF905_Init(nRF905 init_struct)  {
 
 	g_nRF905_Config = init_struct;
+	setChipEnable(true);				//CS -> High (Deshabilitamos)
 
-
-#ifdef MSP430
-
-	SetBit(CHIP_ENABLE_NRF_OUT,CHIP_ENABLE_NRF);		//CS -> High (Deshabilitamos)
-
-#endif
-#ifdef EDU_CIAA
-
-	Chip_GPIO_SetPinState( LPC_GPIO_PORT, CHIP_ENABLE_GPIO, CHIP_ENABLE_PIN, true); //CS -> High (Deshabilitamos)
-
-#endif
+	setTRX_ChipEnable(false);			//modulo en powerdown
+	setTX_Enable(false);
+	setPowerUp(false);
 
 }
 
@@ -701,7 +694,7 @@ void nRF905_PowerMode(ePowerMode_t X)  {
 		setPowerUp(true);
 
 		//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
-		g_nRF905_Config->Delay_ms(3);
+		g_nRF905_Config.Delay_ms(3);
 		break;
 
 	case eRadioEnabled:
@@ -730,7 +723,7 @@ void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool 
 	setTX_Enable(true);
 
 	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
-	g_nRF905_Config->Delay_ms(3);
+	g_nRF905_Config.Delay_ms(3);
 
 	//Cargar payload y TX address
 	nRF905_setTXAddress(address);
@@ -741,7 +734,7 @@ void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool 
 
 	if(!keep_radio_on)  {
 		//esperar 1ms
-		g_nRF905_Config->Delay_ms(1);
+		g_nRF905_Config.Delay_ms(1);
 
 		//TRX_CE = 0 (Radio apagada)
 		setTRX_ChipEnable(false);
@@ -749,7 +742,7 @@ void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool 
 
 	//esperar tpreamble + (total Bites / 50kbps) ==> 200us + (32(address) + 32*8(payload) + 16(CRC)) / 50e3
 	//	* --> esperar 6.28ms (redondeamos a 7)
-	g_nRF905_Config->Delay_ms(7);
+	g_nRF905_Config.Delay_ms(7);
 }
 
 /**
@@ -773,7 +766,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	setTX_Enable(true);
 
 	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
-	g_nRF905_Config->Delay_ms(3);
+	g_nRF905_Config.Delay_ms(3);
 
 	//escuchamos por 21 ms	(equivale a 3 transmisiones completas)
 	setTRX_ChipEnable(true);
@@ -781,7 +774,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	timeout = TIME_OUT_AM;
 	while (!getAddressMatch() &&  timeout != 0)  {
 		timeout--;
-		g_nRF905_Config->Delay_ms(1);
+		g_nRF905_Config.Delay_ms(1);
 	}
 
 	//si salimos por un timeout, retornamos aqui (excepcion)
@@ -794,7 +787,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	//o AddressMatch se pone a cero, por un CRC erroneo
 	//o DataReady se pone en alto por un CRC correcto
 	while (getAddressMatch() &&  !getDataReady())  {
-		g_nRF905_Config->Delay_ms(1);
+		g_nRF905_Config.Delay_ms(1);
 	}
 
 	//si salimos porque AddressMatch se puso a cero, retornamos aqui (excepcion)

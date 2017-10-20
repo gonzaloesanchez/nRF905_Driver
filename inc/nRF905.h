@@ -244,6 +244,8 @@ bool nRF905_ChanelConfig(void);
 bool nRF905_WriteConfig(void);
 
 void nRF905_PowerMode(ePowerMode_t X);
+void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on);
+eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on);
 
 
 #endif /* NRF905_H_ */
