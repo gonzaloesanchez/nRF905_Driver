@@ -16,7 +16,8 @@
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
  */
-//#define EDU_CIAA
+#define EDU_CIAA
+#define COORD
 
 /**
  * @brief Definiciones generales para el proyecto.
@@ -169,15 +170,25 @@
 
 
 /**
+ * Definiciones no asociadas al hardware
+ */
+
+#define RAND_LENGTH		10
+#define TIME_OUT_AM		21
+
+
+enum _ePowerMode {ePowerDown,eStandBy,eRadioEnabled};
+enum _eRxStatus {eNoAM,eCRCFail,eDataReady};
+
+typedef enum _ePowerMode ePowerMode_t;
+typedef enum _eRxStatus eRxStatus_t;
+
+/**
  * Definicion de estructura de datos para contener configuracion del driver
  * Las definiciones de CD, AM, y DR son para soportar la utilizacion de interrupciones
  */
 
-enum _eComm {eCommFail=-1,eCommNAck=0,eCommAck=1};
-enum _eTipo {eTypeACK=0,eTypePeso=0x0D/*TODO: Completar tipos de datos */};
-
-typedef enum _eComm eComm_t;
-typedef enum _eTipo eTipo_t;
+typedef void (*DelayFnc)(uint32_t);		//definicion de puntero a funcion para delay
 
 struct _nRF905 {
 	uint16_t Canal;				//Canal en el que esta trabajando el modulo
@@ -198,6 +209,8 @@ struct _nRF905 {
 	bool CRC_Mode;				//Booleano para describir el modo crc (1 => CRC16; 0 => CRC8)
 	bool CRC_Enable;			//Habilitacion del checkeo CRC
 
+	DelayFnc Delay_ms;			//puntero a funcion delay que debe ser implementado fuera
+
 	bool CD;					//Flag Carrier Detect para interrupciones
 	bool AM;					//Flag Address Match para interrupciones
 	bool DR;					//Flag Data Ready para interrupciones
@@ -206,16 +219,10 @@ struct _nRF905 {
 						//En los casos que la limpieza no sea posible, por limitaciones
 						//de HW, es responsabilidad del programador la limpieza de
 						//estos FLAGS
-};
 
-struct _sPacket  {
-	uint8_t sizeofPacket;
-	eTipo_t Tipo;
-	uint8_t Payload[MAX_TX_RX_PAYLOAD-2];
 };
 
 typedef struct _nRF905 nRF905;
-typedef struct _sPacket sPacket_t;
 
 
 //extern nRF905 g_nRF905_Config;
@@ -228,13 +235,15 @@ bool getCarrierDetect_FromIRQ(void);
 void setCarrierDetect_FromIRQ(bool X);
 void setSPI_IRQFlag(void);
 
-void nRF905_Init(void);
+void nRF905_Init(nRF905 init_struct);
 void nRF905_setTXFlag(void);
 bool nRF905_setTXAddress(uint32_t Direccion);
 bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes);
 bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes);
 bool nRF905_ChanelConfig(void);
 bool nRF905_WriteConfig(void);
+
+void nRF905_PowerMode(ePowerMode_t X);
 
 
 #endif /* NRF905_H_ */
