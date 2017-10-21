@@ -28,6 +28,7 @@
 #define C_WRITE_TX_ADDRR		0x22	//Comando SPI para escribir la direccion donde transmitir
 #define C_WRITE_TX_PAYLOAD		0x20	//Comando SPI para escribir los datos a transmitir
 #define C_READ_RX_PAYLOAD		0x24	//Comando SPI para leer los datos recibidos
+#define C_WRITE_CONFIG			0x00	//comando para comenzar la configuracion desde byte 0
 
 
 #define CONFIG_MASK				0x80	//mascara para el comando SPI especial ChannelConfig
@@ -36,7 +37,7 @@
 #define CONFIG_REG_LENGTH		10		//longitud en bytes del registro de configuracion
 #define HFREQ_PLL_433			0		//bit para especificar al PLL en que banda trabajar (433[MHz])
 #define HFREQ_PLL_868_915		1		//868[MHz] o 915[MHz]
-#define DEFAULT_CHANNEL			0x006B	//esto se utiliza en la inicializacion, corresponde a 433.1[MHz]
+#define DEFAULT_CHANNEL			0x006C	//esto se utiliza en la inicializacion, corresponde a 433.2[MHz]
 
 #define XOF_4MHZ				0		//Seteos necesarios para indicar al integrado el cristal que
 #define XOF_8MHZ				1		//utiliza como base para el PLL
@@ -238,6 +239,9 @@ void setDataReady_FromIRQ(bool X);
 bool getCarrierDetect_FromIRQ(void);
 void setCarrierDetect_FromIRQ(bool X);
 void setSPI_IRQFlag(void);
+void setTRX_ChipEnable(bool Value);
+void setTX_Enable(bool Value);
+void setPowerUp(bool Value);
 
 void nRF905_Init(nRF905 init_struct);
 void nRF905_setTXFlag(void);

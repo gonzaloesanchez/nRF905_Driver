@@ -149,6 +149,7 @@ static bool spi_read(uint8_t *R)  {
 	 * de todas maneras no lo uso para nada al read (no se implemento ninguna funcion de
 	 * lectura)
 	 * */
+	*R = UCB0RXBUF;	//devolvemos el dato leido
 	Ret = true;
 
 #endif
@@ -635,7 +636,7 @@ bool nRF905_WriteConfig(void)  {
 	config_reg[0] = g_nRF905_Config.Canal & 0xFF;
 	config_reg[1] = (g_nRF905_Config.Retransmision << 5) | (g_nRF905_Config.Potencia_Rx << 4) |
 					(g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
-					((g_nRF905_Config.Canal & 0x100000000) >> 8);
+					((g_nRF905_Config.Canal & 0x100) >> 8);
 	config_reg[2] = (g_nRF905_Config.LongTX_Address << 4) | g_nRF905_Config.LongRX_Address;
 	config_reg[3] = g_nRF905_Config.LongRX_Payload;
 	config_reg[4] = g_nRF905_Config.LongTX_Payload;
@@ -650,6 +651,12 @@ bool nRF905_WriteConfig(void)  {
 
 
 	setChipEnable(false);		//Bajamos chip select
+
+	if(!	spi_write(C_WRITE_CONFIG))  {	//comando para escribir en el registro de configuracion
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+
 	for(i=0;i<CONFIG_REG_LENGTH;i++)  {
 		if(!spi_write(config_reg[i]))  {	//comando para escribir en el registro de configuracion
 			setChipEnable(true);		//excepcion
@@ -665,6 +672,7 @@ bool nRF905_WriteConfig(void)  {
 
 	return Ret;
 }
+
 //*********************************************************************************************
 
 
@@ -763,7 +771,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	setPowerUp(true);
 
 	//TX_EN = 0 --> recepcion
-	setTX_Enable(true);
+	setTX_Enable(false);
 
 	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
 	g_nRF905_Config.Delay_ms(3);
