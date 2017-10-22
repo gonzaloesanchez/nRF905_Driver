@@ -583,7 +583,7 @@ bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 		}
 
 		for (i=0;i<cant_bytes;i++) {
-			if(!spi_write(data_rx[i]))  {	//comando para escribir registros de direccion de TX
+			if(!spi_read(data_rx+i))  {	//comando para escribir registros de direccion de TX
 				setChipEnable(true);		//excepcion
 				return Ret;
 			}
