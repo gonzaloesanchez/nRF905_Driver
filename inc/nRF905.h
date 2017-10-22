@@ -16,8 +16,8 @@
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
  */
-#define EDU_CIAA
-#define COORD
+//#define EDU_CIAA
+//#define COORD
 
 /**
  * @brief Definiciones generales para el proyecto.
@@ -245,6 +245,7 @@ void setSPI_IRQFlag(void);
 void setTRX_ChipEnable(bool Value);
 void setTX_Enable(bool Value);
 void setPowerUp(bool Value);
+bool getCarrierDetect(void);
 
 void nRF905_Init(nRF905 init_struct);
 void nRF905_setTXFlag(void);
