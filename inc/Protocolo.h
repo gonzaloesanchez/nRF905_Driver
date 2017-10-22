@@ -8,20 +8,44 @@
 #ifndef NRF905_DRIVER_INC_PROTOCOLO_H_
 #define NRF905_DRIVER_INC_PROTOCOLO_H_
 
+#include "nRF905.h"
+#include <string.h>
 
-enum _eComm {eCommFail=-1,eCommNAck=0,eCommAck=1};
-enum _eTipo {eTypeACK=0,eTypePeso=0x0D/*TODO: Completar tipos de datos */};
+#define MAX_PACKET_PAYLOAD	26
 
-typedef enum _eComm eComm_t;
-typedef enum _eTipo eTipo_t;
+enum _eCommStatus {eCommFail=-1,eCommNAck=0,eCommAck=1};
+enum _eTipoComm {eTipoACK = 0,
+				 eTipoNACK = 0xFF,
+				 eTipoPeso = 0x0D,
+				 eTipoPesoReq = 0x1D,
+				 eTipoLogReq = 0x01,
+				 eTipoConfig = 0x02,
+				 eTipoEstadoBatReq = 0xEB,
+				 eTipoEstadoBat = 0xEC,
+				 eTipoMensajeReq = 0x03,
+				 eTipoCheckCommReq = 0xCC,
+				 eTipoCheckCommDev = 0xCD,
+				 eTipoCheckCommDevF = 0xCF
+				};
+
+typedef enum _eCommStatus eCommStatus_t;
+typedef enum _eTipoComm eTipoComm_t;
 
 struct _sPacket  {
-	uint8_t sizeofPacket;
-	eTipo_t Tipo;
-	uint8_t Payload[MAX_TX_RX_PAYLOAD-2];
+	eTipoComm_t Tipo;
+	uint32_t Address;
+	uint8_t sizeofData;
+	uint8_t Payload[MAX_PACKET_PAYLOAD];
+
 };
 
 typedef struct _sPacket sPacket_t;
+
+bool Protocol_Rx(sPacket_t *Paquete,bool retrans);
+void Protocol_TX(sPacket_t *Paquete,bool retrans);
+sPacket_t Protocol_PacketForm(uint32_t Address,eTipoComm_t Tipo,void* Data);
+void Protocol_CheckMedio(void);
+void Protocol_Init(void(*delay_func)(uint32_t x));
 
 
 #endif /* NRF905_DRIVER_INC_PROTOCOLO_H_ */

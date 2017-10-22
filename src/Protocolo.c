@@ -7,11 +7,11 @@
 
 //TODO: ordenar esto, es un quilombo
 
+#include "Protocolo.h"
 
-/*
-static uint16_t g_Ticks_ms;		//esta variable es de apoyo para calcular los tiempos
-								//de espera requeridos por distintas funciones del protocolo
-								//a implementar
+static void (*External_delay)(uint32_t delay_ms);
+
+
 
 //definiciones de vectores "Aleatorios" para los retardos aleatorios necesarios en el protocolo
 //compilacion dependiente del dispositivo. Esto es para ahorrar tiempo de ejecucion y memoria
@@ -33,80 +33,14 @@ static const uint8_t g_rand[RAND_LENGTH] = {51,48,25,61,44,34,26,35,59,61};
 
 static void espera_aleatoria(void)  {
 	static uint8_t contador = 0;
-	uint16_t ticks_inicial;
 
-	ticks_inicial = g_Ticks_ms;
-
-	while ((g_Ticks_ms-ticks_inicial) < g_rand[contador])
-		wait_for_interrupt();
+	External_delay(g_rand[contador]);		//funcion external delay esta implementada fuera de este modulo
 
 	contador++;					//esta porcion de codigo incrementa contador en forma
 	contador %= RAND_LENGTH;	//ciclica y evita que contador salga del limite de RAND_LENGTH
 
 }
 
-
-*/
-
-/**
- * Esta funcion es "bloqueante", queda en espera hasta que se libere el medio
- * La implementacion es la siguiente: se hace un polling del pin CarrierDetect
- * mediante un bucle con esperas aleatorias entre pasadas hasta que Carrier Detect = LOW
- *
- * @note Es bloqueante con respecto al programa, pero libera el procesador esperando
- * 		 interrupciones para la espera aleatoria
- *
- * @note Tiempo en el aire de un paquete completo desde la activacion de Tx es ~6.93[ms]
- */
-/*
-void nRF905_CheckMedio(void)  {
-
-	while (getCarrierDetect())
-		espera_aleatoria();
-}
-*/
-/**
- * Esta funcion debe ser llamada desde la interrupcion de SysTick (o timer) con periodo 1[ms]
- * si accion = true -> incrementamos el contador. si accion = false -> el contador se pone a cero
- * Devuelve el valor de la variable Ticks
- */
-/*
-void nRF905_TickIncrease(void)  {
-	g_Ticks_ms++;
-}
-
-void nRF905_TickClear(void)  {
-	g_Ticks_ms = 0;
-}
-
-uint16_t nRF905_TickGet(void)  {
-	return g_Ticks_ms;
-}
-*/
-
-/*****************************************************************************************
- * Funcion wait_for_interrupt es en realidad un encapsulamiento de una instruccion WFI
- * o de LPM
- *****************************************************************************************/
-/*
-static void wait_for_interrupt(void)  {
-
-
-#ifdef EDU_CIAA
-	__WFI();
-#endif
-
-
-#ifdef MSP430
-	LPM2;			//macro para entrar en LPM2.
-					//checkear que el SMCLK siga funcionando en este modo
-					//recordar lpm_exit_on_return() para el timer que implemente el tick
-#endif
-}
-
-
-
-*/
 
 /*=============================================================================================
  * 				FUNCIONES BASICAS PARA TRANSMISION Y RECEPCION DE DATOS VIA RF
@@ -116,40 +50,16 @@ static void wait_for_interrupt(void)  {
  * 	estan por sobre la HAL, pero a su vez, tanto las funciones HAL utilizadas, como las de
  * 	protocolo implementadas, son accesibles por el programador.
  =============================================================================================*/
-/*
-static void espera_aleatoria(void)  {
-	static uint8_t contador = 0;
-	uint16_t ticks_inicial;
 
-	ticks_inicial = g_Ticks_ms;
 
-	while ((g_Ticks_ms-ticks_inicial) < g_rand[contador])
-		wait_for_interrupt();
-
-	contador++;					//esta porcion de codigo incrementa contador en forma
-	contador %= RAND_LENGTH;	//ciclica y evita que contador salga del limite de RAND_LENGTH
-
-}
-
-*/
 /**
- * Esta funcion debe ser llamada desde la interrupcion de SysTick (o timer) con periodo 1[ms]
- * si accion = true -> incrementamos el contador. si accion = false -> el contador se pone a cero
- * Devuelve el valor de la variable Ticks
+ * Esta funcion solamente pasa el puntero de la funcion delay externa hacia un puntero interno
+ * para uso encapsulado. Nos da la posibilidad de definir la funcion delay como se desee
  */
-/*
-void nRF905_TickIncrease(void)  {
-	g_Ticks_ms++;
+void Protocol_Init(void(*delay_func)(uint32_t x))  {
+	External_delay = delay_func;		//esta es la funcion de delay que se toma desde fuera
 }
 
-void nRF905_TickClear(void)  {
-	g_Ticks_ms = 0;
-}
-
-uint16_t nRF905_TickGet(void)  {
-	return g_Ticks_ms;
-}
-*/
 /**
  * Esta funcion es "bloqueante", queda en espera hasta que se libere el medio
  * La implementacion es la siguiente: se hace un polling del pin CarrierDetect
@@ -160,13 +70,137 @@ uint16_t nRF905_TickGet(void)  {
  *
  * @note Tiempo en el aire de un paquete completo desde la activacion de Tx es ~6.93[ms]
  */
-/*
-void nRF905_CheckMedio(void)  {
+void Protocol_CheckMedio(void)  {
 
 	while (getCarrierDetect())
 		espera_aleatoria();
 }
-*/
+
+sPacket_t Protocol_PacketForm(uint32_t Address,eTipoComm_t Tipo,void* Data)  {
+	sPacket_t Packet;
+	uint8_t i;
+
+	Packet.Tipo = Tipo;
+	Packet.Address = Address;
+
+
+	switch (Tipo)  {
+
+	case eTipoACK:
+	case eTipoNACK:
+	case eTipoPesoReq:
+	case eTipoEstadoBatReq:
+	case eTipoMensajeReq:
+	case eTipoCheckCommReq:
+	case eTipoCheckCommDev:
+		Packet.sizeofData = 0;
+		break;
+
+
+	case eTipoPeso:
+	case eTipoConfig:
+		Packet.sizeofData = sizeof(uint32_t);
+		memcpy(Packet.Payload,Data,Packet.sizeofData);
+		break;
+
+
+	case eTipoLogReq:
+		i = 0;
+
+		//este while nos asegura que la cadena enviada nunca sera mayor al lugar
+		//que se tiene para almacenarla, a lo sumo se cortara
+		while((((char*)Data)[i] != NULL) && (i < MAX_PACKET_PAYLOAD))
+			i++;
+
+		if(i == MAX_PACKET_PAYLOAD-1)	//en el caso de que la cadena sea demasiado larga
+			((char*)Data)[i] = NULL;				//la cortamos en el ultimo byte disponible
+
+		Packet.sizeofData = i;
+		memcpy(Packet.Payload,Data,Packet.sizeofData);
+		break;
+
+
+	case eTipoEstadoBat:
+		Packet.sizeofData = sizeof(uint16_t);
+		memcpy(Packet.Payload,Data,Packet.sizeofData);
+		break;
+
+
+	case eTipoCheckCommDevF:
+		Packet.sizeofData = sizeof(uint8_t);
+		memcpy(Packet.Payload,Data,Packet.sizeofData);
+		break;
+
+	default:
+		;
+	}
+
+	return Packet;
+
+}
+
+/**
+ * Esta funcion arma el paquete del protocolo y lo envia mediante la HAL del nRF905
+ * implementada.
+ */
+void Protocol_TX(sPacket_t *Paquete,bool retrans)  {
+	uint8_t Buffer[MAX_TX_RX_PAYLOAD];
+	uint8_t pointer = 0;
+
+	Buffer[pointer] = (uint8_t)Paquete->Tipo;		//primer byte = tipo de paquete
+	pointer += sizeof(uint8_t);
+
+	memcpy(Buffer+pointer,&(Paquete->Address),sizeof(uint32_t));	//siguientes 4 bytes = direccion
+	pointer += sizeof(uint32_t);
+
+	Buffer[pointer] = Paquete->sizeofData;					//siguiente byte = cantidad de bytes en data
+
+	if(Paquete->sizeofData != 0)  {
+		pointer += sizeof(uint8_t);							//si es != 0 cargamos data
+		memcpy((Buffer+pointer),Paquete->Payload,Paquete->sizeofData);
+	}
+
+	nRF905_RF_TxData(Paquete->Address,Buffer,MAX_TX_RX_PAYLOAD,retrans);		//envio de datos RAW
+}
+
+/**
+ * Esta funcion se encarga de recibir los datos desde un dispositivo remoto
+ */
+bool Protocol_Rx(sPacket_t *Paquete,bool retrans)  {
+	uint8_t Buffer[MAX_TX_RX_PAYLOAD];
+	uint8_t pointer = 0;
+	eRxStatus_t rxStatus;
+	bool Ret = false;
+
+	rxStatus = nRF905_RF_RxData(Buffer,MAX_TX_RX_PAYLOAD,retrans);		//recepcion de RAW data
+
+	if (rxStatus == eDataReady)  {
+		Paquete->Tipo = (eTipoComm_t)Buffer[pointer];					//si la recepcion fue exitosa
+		pointer += sizeof(uint8_t);										//extraemos el tipo de datos
+
+		memcpy(&(Paquete->Address),Buffer+pointer,sizeof(uint32_t));
+		pointer += sizeof(Paquete->Address);								//extraemos quien lo esta enviando
+
+		Paquete->sizeofData = Buffer[pointer];
+
+		if(Paquete->sizeofData != 0)  {
+			pointer += sizeof(uint8_t);						//extraemos data
+			memcpy(Paquete->Payload,(Buffer+pointer),Paquete->sizeofData);
+		}
+
+		Ret = true;
+	}
+
+	return Ret;
+}
+
+
+
+
+
+
+
+
 
 
 

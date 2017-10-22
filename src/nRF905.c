@@ -546,7 +546,7 @@ bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes)  {
 	bool Ret = false;
 	uint8_t i;
 
-	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+	if (cant_bytes <= MAX_TX_RX_PAYLOAD)  {
 		setChipEnable(false);		//Bajamos chip select
 		if(!spi_write(C_WRITE_TX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
 			setChipEnable(true);		//excepcion
@@ -575,7 +575,7 @@ bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 	bool Ret = false;
 	uint8_t i;
 
-	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+	if (cant_bytes <= MAX_TX_RX_PAYLOAD)  {
 		setChipEnable(false);		//Bajamos chip select
 		if(!spi_write(C_READ_RX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
 			setChipEnable(true);		//excepcion

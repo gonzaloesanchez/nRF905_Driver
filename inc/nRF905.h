@@ -16,7 +16,7 @@
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
  */
-//#define EDU_CIAA
+#define EDU_CIAA
 #define COORD
 
 /**
@@ -60,7 +60,10 @@
 
 #define NO_TX_ADDRR				0xFFFFFFFF
 #define NO_RX_ADDRR				0xFFFFFFFF
-#define DEV1_RX_ADDRR			0xA7854C91
+#define DEV1_RX_ADDRR			0xA7854C91			//Plano izq
+#define DEV2_RX_ADDRR			0xD348EA56			//Plano der
+#define DEV3_RX_ADDRR			0x2DF95B6C			//Nariz
+#define COORD_RX_ADDRR			0xC473D28A			//Nodo principal
 
 
 /**
