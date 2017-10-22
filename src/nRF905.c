@@ -140,15 +140,20 @@ static bool spi_write(uint8_t Comando)  {
  */
 static bool spi_read(uint8_t *R)  {
 	bool Ret = false;
-	uint32_t Aux;
 
 
 #ifdef MSP430
 	/*
-	 * No me sirve de mucho en esta arquitectura porque solamente tiene un byte de buffer
-	 * de todas maneras no lo uso para nada al read (no se implemento ninguna funcion de
-	 * lectura)
+	 * Como la transaccion se da simultaneamente (lectura y escritura) hay que poner un
+	 * Dummy byte en transmision para poder recibir algo (recordar que el micro
+	 *  es el master)
 	 * */
+	UCB0TXBUF = 0xFF;					//Comienza la transmision, DUMMY byte
+	while (!g_spi_IRQFlag)  {			//esperamos un evento
+			LPM3;								//entramos en LowPowerMode. Es una macro esto
+	}
+	g_spi_IRQFlag = false;
+
 	*R = UCB0RXBUF;	//devolvemos el dato leido
 	Ret = true;
 

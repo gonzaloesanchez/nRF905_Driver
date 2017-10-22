@@ -76,12 +76,12 @@ void Protocol_CheckMedio(void)  {
 		espera_aleatoria();
 }
 
-sPacket_t Protocol_PacketForm(uint32_t Address,eTipoComm_t Tipo,void* Data)  {
+sPacket_t Protocol_PacketForm(uint32_t AddressFrom,eTipoComm_t Tipo,void* Data)  {
 	sPacket_t Packet;
 	uint8_t i;
 
 	Packet.Tipo = Tipo;
-	Packet.Address = Address;
+	Packet.Address = AddressFrom;
 
 
 	switch (Tipo)  {
@@ -143,7 +143,7 @@ sPacket_t Protocol_PacketForm(uint32_t Address,eTipoComm_t Tipo,void* Data)  {
  * Esta funcion arma el paquete del protocolo y lo envia mediante la HAL del nRF905
  * implementada.
  */
-void Protocol_TX(sPacket_t *Paquete,bool retrans)  {
+void Protocol_Tx(uint32_t AddresTo,sPacket_t *Paquete,bool retrans)  {
 	uint8_t Buffer[MAX_TX_RX_PAYLOAD];
 	uint8_t pointer = 0;
 
@@ -160,7 +160,7 @@ void Protocol_TX(sPacket_t *Paquete,bool retrans)  {
 		memcpy((Buffer+pointer),Paquete->Payload,Paquete->sizeofData);
 	}
 
-	nRF905_RF_TxData(Paquete->Address,Buffer,MAX_TX_RX_PAYLOAD,retrans);		//envio de datos RAW
+	nRF905_RF_TxData(AddresTo,Buffer,MAX_TX_RX_PAYLOAD,retrans);		//envio de datos RAW
 }
 
 /**

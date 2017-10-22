@@ -42,8 +42,8 @@ struct _sPacket  {
 typedef struct _sPacket sPacket_t;
 
 bool Protocol_Rx(sPacket_t *Paquete,bool retrans);
-void Protocol_TX(sPacket_t *Paquete,bool retrans);
-sPacket_t Protocol_PacketForm(uint32_t Address,eTipoComm_t Tipo,void* Data);
+void Protocol_Tx(uint32_t AddresTo,sPacket_t *Paquete,bool retrans);
+sPacket_t Protocol_PacketForm(uint32_t AddressFrom,eTipoComm_t Tipo,void* Data);
 void Protocol_CheckMedio(void);
 void Protocol_Init(void(*delay_func)(uint32_t x));
 
