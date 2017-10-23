@@ -15,8 +15,18 @@
 
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
+ *
+ * #define EDU_CIAA
+ * #define COORD
+ *
+ * #define MSP430
+ * #define DEV1
+ * #define DEV2
+ * #define DEV3
  */
-//#define EDU_CIAA
+
+#define EDU_CIAA
+#define COORD
 
 /**
  * @brief Definiciones generales para el proyecto.
@@ -27,6 +37,7 @@
 #define C_WRITE_TX_ADDRR		0x22	//Comando SPI para escribir la direccion donde transmitir
 #define C_WRITE_TX_PAYLOAD		0x20	//Comando SPI para escribir los datos a transmitir
 #define C_READ_RX_PAYLOAD		0x24	//Comando SPI para leer los datos recibidos
+#define C_WRITE_CONFIG			0x00	//comando para comenzar la configuracion desde byte 0
 
 
 #define CONFIG_MASK				0x80	//mascara para el comando SPI especial ChannelConfig
@@ -35,7 +46,7 @@
 #define CONFIG_REG_LENGTH		10		//longitud en bytes del registro de configuracion
 #define HFREQ_PLL_433			0		//bit para especificar al PLL en que banda trabajar (433[MHz])
 #define HFREQ_PLL_868_915		1		//868[MHz] o 915[MHz]
-#define DEFAULT_CHANNEL			0x006B	//esto se utiliza en la inicializacion, corresponde a 433.1[MHz]
+#define DEFAULT_CHANNEL			0x006C	//esto se utiliza en la inicializacion, corresponde a 433.2[MHz]
 
 #define XOF_4MHZ				0		//Seteos necesarios para indicar al integrado el cristal que
 #define XOF_8MHZ				1		//utiliza como base para el PLL
@@ -54,7 +65,14 @@
 #define PA_PWR_PLUS_10DBM		3
 
 #define CRC16_MODE				1
-#define CRC8_MODE				0
+#define CRC8_MODE					0
+
+#define NO_TX_ADDRR				0xFFFFFFFF
+#define NO_RX_ADDRR				0xFFFFFFFF
+#define DEV1_RX_ADDRR			0xA7854C91			//Plano izq
+#define DEV2_RX_ADDRR			0xD348EA56			//Plano der
+#define DEV3_RX_ADDRR			0x2DF95B6C			//Nariz
+#define COORD_RX_ADDRR			0xC473D28A			//Nodo principal
 
 
 /**
@@ -169,9 +187,25 @@
 
 
 /**
+ * Definiciones no asociadas al hardware
+ */
+
+#define RAND_LENGTH		10
+#define TIME_OUT_AM		8
+
+
+enum _ePowerMode {ePowerDown,eStandBy,eRadioEnabled};
+enum _eRxStatus {eNoAM,eCRCFail,eDataReady};
+
+typedef enum _ePowerMode ePowerMode_t;
+typedef enum _eRxStatus eRxStatus_t;
+
+/**
  * Definicion de estructura de datos para contener configuracion del driver
  * Las definiciones de CD, AM, y DR son para soportar la utilizacion de interrupciones
  */
+
+typedef void (*DelayFnc)(uint32_t);		//definicion de puntero a funcion para delay
 
 struct _nRF905 {
 	uint16_t Canal;				//Canal en el que esta trabajando el modulo
@@ -192,6 +226,8 @@ struct _nRF905 {
 	bool CRC_Mode;				//Booleano para describir el modo crc (1 => CRC16; 0 => CRC8)
 	bool CRC_Enable;			//Habilitacion del checkeo CRC
 
+	DelayFnc Delay_ms;			//puntero a funcion delay que debe ser implementado fuera
+
 	bool CD;					//Flag Carrier Detect para interrupciones
 	bool AM;					//Flag Address Match para interrupciones
 	bool DR;					//Flag Data Ready para interrupciones
@@ -200,10 +236,11 @@ struct _nRF905 {
 						//En los casos que la limpieza no sea posible, por limitaciones
 						//de HW, es responsabilidad del programador la limpieza de
 						//estos FLAGS
+
 };
 
-
 typedef struct _nRF905 nRF905;
+
 
 //extern nRF905 g_nRF905_Config;
 
@@ -214,14 +251,22 @@ void setDataReady_FromIRQ(bool X);
 bool getCarrierDetect_FromIRQ(void);
 void setCarrierDetect_FromIRQ(bool X);
 void setSPI_IRQFlag(void);
+void setTRX_ChipEnable(bool Value);
+void setTX_Enable(bool Value);
+void setPowerUp(bool Value);
+bool getCarrierDetect(void);
 
-void nRF905_Init(void);
+void nRF905_Init(nRF905 init_struct);
 void nRF905_setTXFlag(void);
 bool nRF905_setTXAddress(uint32_t Direccion);
 bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes);
 bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes);
 bool nRF905_ChanelConfig(void);
 bool nRF905_WriteConfig(void);
+
+void nRF905_PowerMode(ePowerMode_t X);
+void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on);
+eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on);
 
 
 #endif /* NRF905_H_ */
