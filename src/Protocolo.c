@@ -143,7 +143,7 @@ sPacket_t Protocol_PacketForm(uint32_t AddressFrom,eTipoComm_t Tipo,void* Data) 
  * Esta funcion arma el paquete del protocolo y lo envia mediante la HAL del nRF905
  * implementada.
  */
-void Protocol_Tx(uint32_t AddresTo,sPacket_t *Paquete,bool retrans)  {
+void Protocol_Tx(uint32_t AddresTo,sPacket_t *Paquete,bool keep_radio_on)  {
 	uint8_t Buffer[MAX_TX_RX_PAYLOAD];
 	uint8_t pointer = 0;
 
@@ -160,19 +160,19 @@ void Protocol_Tx(uint32_t AddresTo,sPacket_t *Paquete,bool retrans)  {
 		memcpy((Buffer+pointer),Paquete->Payload,Paquete->sizeofData);
 	}
 
-	nRF905_RF_TxData(AddresTo,Buffer,MAX_TX_RX_PAYLOAD,retrans);		//envio de datos RAW
+	nRF905_RF_TxData(AddresTo,Buffer,MAX_TX_RX_PAYLOAD,keep_radio_on);		//envio de datos RAW
 }
 
 /**
  * Esta funcion se encarga de recibir los datos desde un dispositivo remoto
  */
-bool Protocol_Rx(sPacket_t *Paquete,bool retrans)  {
+bool Protocol_Rx(sPacket_t *Paquete, bool keep_radio_on)  {
 	uint8_t Buffer[MAX_TX_RX_PAYLOAD];
 	uint8_t pointer = 0;
 	eRxStatus_t rxStatus;
 	bool Ret = false;
 
-	rxStatus = nRF905_RF_RxData(Buffer,MAX_TX_RX_PAYLOAD,retrans);		//recepcion de RAW data
+	rxStatus = nRF905_RF_RxData(Buffer,MAX_TX_RX_PAYLOAD,keep_radio_on);		//recepcion de RAW data
 
 	if (rxStatus == eDataReady)  {
 		Paquete->Tipo = (eTipoComm_t)Buffer[pointer];					//si la recepcion fue exitosa

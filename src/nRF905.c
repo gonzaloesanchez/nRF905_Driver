@@ -781,7 +781,7 @@ eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio
 	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
 	g_nRF905_Config.Delay_ms(3);
 
-	//escuchamos por 21 ms	(equivale a 3 transmisiones completas)
+	//escuchamos por el tiempo equivalente a una transmision completa
 	setTRX_ChipEnable(true);
 
 	timeout = TIME_OUT_AM;

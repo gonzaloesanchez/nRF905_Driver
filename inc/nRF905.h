@@ -182,7 +182,7 @@
  */
 
 #define RAND_LENGTH		10
-#define TIME_OUT_AM		21
+#define TIME_OUT_AM		8
 
 
 enum _ePowerMode {ePowerDown,eStandBy,eRadioEnabled};
