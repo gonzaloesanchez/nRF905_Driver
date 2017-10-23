@@ -15,9 +15,18 @@
 
 /**
  * LA SIGUIENTE DEFINICION ES LA QUE DETERMINA PARA QUE PLACA SE VA A COMPILAR ESTO
+ *
+ * #define EDU_CIAA
+ * #define COORD
+ *
+ * #define MSP430
+ * #define DEV1
+ * #define DEV2
+ * #define DEV3
  */
-//#define EDU_CIAA
-//#define COORD
+
+#define EDU_CIAA
+#define COORD
 
 /**
  * @brief Definiciones generales para el proyecto.
