@@ -44,9 +44,11 @@ static nRF905 g_nRF905_Config;	//variable global que contiene toda la configurac
 								//estructura como argumento
 
 static bool g_spi_IRQFlag;		//esta es una variable global que debe ser seteada
-									//por las interrupciones para las funciones base
-									//de esta libreria. La modificacion solo se hara
-									//mediante funciones set desde las interrupciones
+								//por las interrupciones para las funciones base
+								//de esta libreria. La modificacion solo se hara
+								//mediante funciones set desde las interrupciones
+
+
 
 /*--------------------------------------------------------------------------
  * Funciones de bajo nivel. Estas son las que deben ser re-definidas para
@@ -127,7 +129,7 @@ static bool spi_write(uint8_t Comando)  {
  * Las causas de falla normalmente son que no haya nada en el FIFO
  */
 
-/* TODO: Hay que cambiar las funcion spi_receive por spi_read, para
+/* 		Hay que cambiar las funcion spi_receive por spi_read, para
  * 		abarcar una transaccion completa. Ver Notas
  * 		USAR INTERRUPCIONES
  * 		while(variable_global)  {
@@ -138,15 +140,21 @@ static bool spi_write(uint8_t Comando)  {
  */
 static bool spi_read(uint8_t *R)  {
 	bool Ret = false;
-	uint32_t Aux;
 
 
 #ifdef MSP430
 	/*
-	 * No me sirve de mucho en esta arquitectura porque solamente tiene un byte de buffer
-	 * de todas maneras no lo uso para nada al read (no se implemento ninguna funcion de
-	 * lectura)
+	 * Como la transaccion se da simultaneamente (lectura y escritura) hay que poner un
+	 * Dummy byte en transmision para poder recibir algo (recordar que el micro
+	 *  es el master)
 	 * */
+	UCB0TXBUF = 0xFF;					//Comienza la transmision, DUMMY byte
+	while (!g_spi_IRQFlag)  {			//esperamos un evento
+			LPM3;								//entramos en LowPowerMode. Es una macro esto
+	}
+	g_spi_IRQFlag = false;
+
+	*R = UCB0RXBUF;	//devolvemos el dato leido
 	Ret = true;
 
 #endif
@@ -215,7 +223,7 @@ static void spi_wait(void)  {
 /**
  * Esta funcion es la que se encarga de setear el pin correspondiente a TX_EN
  */
-static void setTX_Enable(bool Value)  {
+void setTX_Enable(bool Value)  {
 
 #ifdef MSP430
 
@@ -236,7 +244,7 @@ static void setTX_Enable(bool Value)  {
  * Funcion getAddressMatch
  * Esta funcion es la que se encarga de setear el pin correspondiente a TRX_CE
  *****************************************************************************************/
-static void setTRX_ChipEnable(bool Value)  {
+void setTRX_ChipEnable(bool Value)  {
 
 
 #ifdef MSP430
@@ -259,7 +267,7 @@ static void setTRX_ChipEnable(bool Value)  {
  * Funcion getAddressMatch
  * Esta funcion es la que se encarga de setear el pin correspondiente a PWR_UP
  *****************************************************************************************/
-static void setPowerUp(bool Value)  {
+void setPowerUp(bool Value)  {
 
 #ifdef MSP430
 
@@ -281,7 +289,7 @@ static void setPowerUp(bool Value)  {
  * Funcion getAddressMatch
  * Esta funcion es la que se encarga de setear el pin correspondiente a PWR_UP
  *****************************************************************************************/
-static void setChipEnable(bool Value)  {
+void setChipEnable(bool Value)  {
 
 #ifdef MSP430
 
@@ -304,7 +312,7 @@ static void setChipEnable(bool Value)  {
 /*****************************************************************************************
  * Funcion getAddressMatch
  *****************************************************************************************/
-static bool getAddressMatch(void)  {
+bool getAddressMatch(void)  {
 	bool Ret;
 	uint8_t Pins;
 
@@ -331,7 +339,7 @@ static bool getAddressMatch(void)  {
 /*****************************************************************************************
  * Funcion getDataReady
  *****************************************************************************************/
-static bool getDataReady(void)  {
+bool getDataReady(void)  {
 	bool Ret;
 	uint8_t Pins;
 
@@ -358,7 +366,7 @@ static bool getDataReady(void)  {
 /*****************************************************************************************
  * Funcion getCarrierDetect
  *****************************************************************************************/
-static bool getCarrierDetect(void)  {
+bool getCarrierDetect(void)  {
 	bool Ret = false;
 	uint8_t Pins;
 
@@ -379,7 +387,6 @@ static bool getCarrierDetect(void)  {
 
 	return Ret;
 }
-
 
 
 /*----------------------------------------------------------------------------------------
@@ -489,38 +496,14 @@ bool nRF905_getStatusReg(uint8_t *status)  {
  * Esta funcion inicia el estado de CS del SPI y las variables de la estructura de datos
  * que controla el estado del modulo con valores por defecto
  */
-void nRF905_Init(void)  {
+void nRF905_Init(nRF905 init_struct)  {
 
-	//TODO: Modificar valores!! Definir constantes para cada caso.
-	//Estos valores no son correctos
-	g_nRF905_Config.Canal = DEFAULT_CHANNEL;
-	g_nRF905_Config.ClockModulo = XOF_16MHZ;
-	g_nRF905_Config.ClockOut = false;
-	g_nRF905_Config.ClockOut_Freq = CLKOUT_500KHZ;		//este valor es ignorado al estar deshabilitada esta funcion
-	g_nRF905_Config.DireccionRX = 0xFFFFFFFF;
-	g_nRF905_Config.DireccionTX = 0xFFFFFFFF;
-	g_nRF905_Config.LongRX_Payload = MAX_TX_RX_PAYLOAD;
-	g_nRF905_Config.LongTX_Payload = MAX_TX_RX_PAYLOAD;
-	g_nRF905_Config.PLL_Freq = HFREQ_PLL_433;
-	g_nRF905_Config.Potencia = PA_PWR_PLUS_10DBM;
-	g_nRF905_Config.Retransmision = false;
-	g_nRF905_Config.Potencia_Rx = false;
-	g_nRF905_Config.LongRX_Address = 4;
-	g_nRF905_Config.LongTX_Address = 4;
-	g_nRF905_Config.CRC_Enable = true;
-	g_nRF905_Config.CRC_Mode = CRC16_MODE;
+	g_nRF905_Config = init_struct;
+	setChipEnable(true);				//CS -> High (Deshabilitamos)
 
-
-#ifdef MSP430
-
-	SetBit(CHIP_ENABLE_NRF_OUT,CHIP_ENABLE_NRF);		//CS -> High (Deshabilitamos)
-
-#endif
-#ifdef EDU_CIAA
-
-	Chip_GPIO_SetPinState( LPC_GPIO_PORT, CHIP_ENABLE_GPIO, CHIP_ENABLE_PIN, true); //CS -> High (Deshabilitamos)
-
-#endif
+	setTRX_ChipEnable(false);			//modulo en powerdown
+	setTX_Enable(false);
+	setPowerUp(false);
 
 }
 
@@ -568,7 +551,7 @@ bool nRF905_TxPayload_wr(uint8_t *data_tx, uint8_t cant_bytes)  {
 	bool Ret = false;
 	uint8_t i;
 
-	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+	if (cant_bytes <= MAX_TX_RX_PAYLOAD)  {
 		setChipEnable(false);		//Bajamos chip select
 		if(!spi_write(C_WRITE_TX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
 			setChipEnable(true);		//excepcion
@@ -597,7 +580,7 @@ bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 	bool Ret = false;
 	uint8_t i;
 
-	if (cant_bytes < MAX_TX_RX_PAYLOAD)  {
+	if (cant_bytes <= MAX_TX_RX_PAYLOAD)  {
 		setChipEnable(false);		//Bajamos chip select
 		if(!spi_write(C_READ_RX_PAYLOAD))  {	//comando para escribir registros de direccion de TX
 			setChipEnable(true);		//excepcion
@@ -605,7 +588,7 @@ bool nRF905_RxPayload_rd(uint8_t *data_rx, uint8_t cant_bytes)  {
 		}
 
 		for (i=0;i<cant_bytes;i++) {
-			if(!spi_write(data_rx[i]))  {	//comando para escribir registros de direccion de TX
+			if(!spi_read(data_rx+i))  {	//comando para escribir registros de direccion de TX
 				setChipEnable(true);		//excepcion
 				return Ret;
 			}
@@ -658,7 +641,7 @@ bool nRF905_WriteConfig(void)  {
 	config_reg[0] = g_nRF905_Config.Canal & 0xFF;
 	config_reg[1] = (g_nRF905_Config.Retransmision << 5) | (g_nRF905_Config.Potencia_Rx << 4) |
 					(g_nRF905_Config.Potencia << 2) | (g_nRF905_Config.PLL_Freq << 1) |
-					((g_nRF905_Config.Canal & 0x100000000) >> 8);
+					((g_nRF905_Config.Canal & 0x100) >> 8);
 	config_reg[2] = (g_nRF905_Config.LongTX_Address << 4) | g_nRF905_Config.LongRX_Address;
 	config_reg[3] = g_nRF905_Config.LongRX_Payload;
 	config_reg[4] = g_nRF905_Config.LongTX_Payload;
@@ -673,6 +656,12 @@ bool nRF905_WriteConfig(void)  {
 
 
 	setChipEnable(false);		//Bajamos chip select
+
+	if(!	spi_write(C_WRITE_CONFIG))  {	//comando para escribir en el registro de configuracion
+		setChipEnable(true);		//excepcion
+		return Ret;
+	}
+
 	for(i=0;i<CONFIG_REG_LENGTH;i++)  {
 		if(!spi_write(config_reg[i]))  {	//comando para escribir en el registro de configuracion
 			setChipEnable(true);		//excepcion
@@ -688,6 +677,158 @@ bool nRF905_WriteConfig(void)  {
 
 	return Ret;
 }
+
+//*********************************************************************************************
+
+
+
+/*=============================================================================================
+ * 				FUNCIONES BASICAS PARA TRANSMISION Y RECEPCION DE DATOS VIA RF
+ *
+ * 	Estas funciones son extensiones de las funciones basicas de la HAL
+ * 	No son parte de la HAL, sino que se construyen en base a estas ultimas. En nivel de capas
+ * 	estan por sobre la HAL, pero a su vez, tanto las funciones HAL utilizadas, como las de
+ * 	Tx/Rx implementadas, son accesibles por el programador.
+ =============================================================================================*/
+
+void nRF905_PowerMode(ePowerMode_t X)  {
+
+	switch(X)  {
+
+	case ePowerDown:
+		setTRX_ChipEnable(false);
+		setTX_Enable(false);
+		setPowerUp(false);
+		break;
+
+	case eStandBy:
+		setTRX_ChipEnable(false);
+		setTX_Enable(false);
+		setPowerUp(true);
+
+		//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
+		g_nRF905_Config.Delay_ms(3);
+		break;
+
+	case eRadioEnabled:
+		setTRX_ChipEnable(true);
+		setPowerUp(true);
+		break;
+
+	default:
+		;
+	}
+}
+/**
+ * Esta funcion envia datos via RF segun el payload que se pase como argumento
+ * el manejo de los power modes debe ser hecho desde fuera, por el protocolo
+ * esto solamente para agregar generalidad
+ *
+ * @warning La funcion debe ser llamada con el modulo en STAND_BY, sino la transmision no sera exitosa
+ */
+void nRF905_RF_TxData(uint32_t address,uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on)  {
+
+	// Salimos de PWR_DOWN
+	setTRX_ChipEnable(false);
+	setPowerUp(true);
+
+	//TX_EN = 1 --> Transmision
+	setTX_Enable(true);
+
+	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
+	g_nRF905_Config.Delay_ms(3);
+
+	//Cargar payload y TX address
+	nRF905_setTXAddress(address);
+	nRF905_TxPayload_wr(Payload,cant_Bytes);
+
+	//TRX_CE = 1 (Radio encendida)
+	setTRX_ChipEnable(true);
+
+	if(!keep_radio_on)  {
+		//esperar 2ms (son aproximados, puede ser 1.1 a 2 ms)
+		g_nRF905_Config.Delay_ms(2);
+
+		//TRX_CE = 0 (Radio apagada)
+		setTRX_ChipEnable(false);
+	}
+
+	//esperar tpreamble + (total Bites / 50kbps) ==> 200us + (32(address) + 32*8(payload) + 16(CRC)) / 50e3
+	//	* --> esperar 6.28ms (redondeamos a 7)
+	g_nRF905_Config.Delay_ms(7);
+}
+
+/**
+ * Esta funcion recibe datos via RF segun el paquete que hayamos conformado antes
+ *
+ * @param *Paquete es en realidad un paquete de recepcion del cual ya se conoce el tipo
+ * 			solamente se carga el payload, pero asi podemos tener trazabilidad del tipo
+ * 			de datos que se esta recibiendo
+ * @return Devuelve true si los datos recibidos tienen un CRC correcto y false si los datos estan
+ * 			corruptos
+ */
+eRxStatus_t nRF905_RF_RxData(uint8_t *Payload,uint8_t cant_Bytes,bool keep_radio_on)  {
+	eRxStatus_t Ret = eNoAM;
+	uint8_t timeout;
+
+	// Salimos de PWR_DOWN
+	//setTRX_ChipEnable(false);
+	setPowerUp(true);
+
+	//TX_EN = 0 --> recepcion
+	setTX_Enable(false);
+
+	//esperar 3ms a STND_BY (PWR_DOWN -> STND_BY 3ms)
+	g_nRF905_Config.Delay_ms(3);
+
+	//escuchamos por el tiempo equivalente a una transmision completa
+	setTRX_ChipEnable(true);
+
+	timeout = TIME_OUT_AM;
+	while (!getAddressMatch() &&  timeout != 0)  {
+		timeout--;
+		g_nRF905_Config.Delay_ms(1);
+	}
+
+	//si salimos por un timeout, retornamos aqui (excepcion)
+	if (timeout == 0)  {
+		setTRX_ChipEnable(false);	//apagamos la radio, excepcion
+		return Ret;
+	}
+
+	//Cuando se termine de recibir los datos tenemos dos opciones
+	//o AddressMatch se pone a cero, por un CRC erroneo
+	//o DataReady se pone en alto por un CRC correcto
+	while (getAddressMatch() &&  !getDataReady())  {
+		g_nRF905_Config.Delay_ms(1);
+	}
+
+	//si salimos porque AddressMatch se puso a cero, retornamos aqui (excepcion)
+	if (!getDataReady())  {
+		setTRX_ChipEnable(false);	//apagamos la radio, excepcion
+		Ret = eCRCFail;
+		return Ret;
+	}
+
+	if(!keep_radio_on)  {
+		setTRX_ChipEnable(false);	//apagamos la radio
+	}
+
+	//Datos recibidos con CRC correcto, a sacarlos del payload
+	nRF905_RxPayload_rd(Payload,cant_Bytes);
+	Ret = eDataReady;
+
+	return Ret;
+}
+
+
+
+
+
+
+
+
+
 
 
 

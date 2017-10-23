@@ -8,3 +8,11 @@ macros.ini_initial
 project0_ccs.cmd
 targetConfigs/
 target_config.ccxml
+
+src/main\.c
+
+inc/Inicializacion\.h
+
+inc/Leds\.h
+
+src/Leds\.c
